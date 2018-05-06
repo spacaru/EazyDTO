@@ -122,6 +122,24 @@ public class GenericConverter {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GenericConverter converter = (GenericConverter) o;
+        return Objects.equals(type, converter.type);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(type);
+    }
+
+    public Class getType() {
+        return type;
+    }
+
     private void concatFieldsAndSetValue(Object source, Object target, Field f, String sourceField, String[] concatFields, Object value, String separator) throws NoSuchFieldException, IllegalAccessException {
         Field field;
         Field targetObjectField = target.getClass().getDeclaredField(f.getName());
@@ -167,21 +185,4 @@ public class GenericConverter {
         return value;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GenericConverter converter = (GenericConverter) o;
-        return Objects.equals(type, converter.type);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(type);
-    }
-
-    public Class getType() {
-        return type;
-    }
 }

@@ -8,27 +8,7 @@ usage :
 <h2>Available annotations </h2>
 <ul>
 <li> @TransferObject - <b>sourceClass</b> - eg : Account.class</li>
-<li> @TransferObjectAttribute - <b>sourceField</b> - entity source field - eg : 'name'
-<br/> If we had the following entity class :
-<br/>
-<code>
-public class Account {
-<br/>         private String name;
-<br/>    }
-<br/>  
-</code>
-<br /> And the following transfer object class:
-<code>
-
-<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b>
-<br/>
- public class AccountTO{
-<br/>
- <b>@TransferObjectAttribute(sourceField='name')</b>
-<br/>
-  private String nameProperty;
-</code>
-</li>
+<li> @TransferObjectAttribute - <b>sourceField</b> - entity source field - eg : 'name'</li>
 </ul>
 
 <h2>Converter manager initialization</h2>
