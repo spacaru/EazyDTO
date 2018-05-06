@@ -19,8 +19,8 @@ public class Account {
 </code>
 <br /> And the following transfer object class:
 <code>
-<div>
-<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b></div>
+
+<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b>
 <br/>
  public class AccountTO{
 <br/>
@@ -39,6 +39,33 @@ public class Account {
        <br> gcm.setPackageName("com.norberth.test");
        
 </code>
+
+<h2> Transfer object example class </h2>
+<code>
+@TransferObject(sourceClass = UserDetails.class)
+public class UserDetailsTO {
+
+    @TransferObjectAttribute(sourceField = "name")
+    private String name;
+    @TransferObjectAttribute(sourceField = "email")
+    private String email;
+    @TransferObjectAttribute(sourceField = "simpleDTO.fullName")
+    private String simpleDtoFullName;
+    @TransferObjectAttribute(sourceField = "name", concatFields = {"surname", "email", "age"}, separator = ";")
+    private String nameAndSurname;
+
+    @Override
+    public String toString() {
+        return "UserDetailsTO{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", simpleDtoFullName='" + simpleDtoFullName + '\'' +
+                ", nameAndSurname='" + nameAndSurname + '\'' +
+                '}';
+    }
+}
+</code>
+
 <h2> Converter usage </h2>
 <code>
 UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norberth.novanc@gmail.com", "password", "Norberth");
