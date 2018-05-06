@@ -18,10 +18,14 @@ public class Account {
 </code>
 <br /> And the following transfer object class:
 <code>
+<br/>
 @TransferObject(sourceClass=Account.class)
-<br/> public class AccountTO{
-<br/> @TransferObjectAttribute(sourceField='name')
-<br/>  private String nameProperty;
+<br/>
+ public class AccountTO{
+<br/>
+ @TransferObjectAttribute(sourceField='name')
+<br/>
+  private String nameProperty;
 </code>
 </li>
 </ul>
