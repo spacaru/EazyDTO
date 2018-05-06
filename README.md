@@ -4,6 +4,28 @@ An easy to use Entity to Transfer Object mapper
 
 usage : 
 
+<h2>Available annotations </h2>
+<ul>
+<li> @TransferObject - <b>sourceClass</b> - eg : Account.class</li>
+<li> @TransferObjectAttribute - <b>sourceField</b> - entity source field - eg : 'name'
+<br/> If we had the following entity class :
+<br/>
+<code>
+public class Account {
+<br/>         private String name;
+<br/>    }
+<br/>  
+</code>
+<br /> And the following transfer object class:
+<code>
+@TransferObject(sourceClass=Account.class)
+<br/> public class AccountTO{
+<br/> @TransferObjectAttribute(sourceField='name')
+<br/>  private String nameProperty;
+</code>
+</li>
+</ul>
+
 <h2>Converter manager initialization</h2>
 
 <code>
@@ -25,7 +47,7 @@ UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norbe
 <h4>Output </h4>
 <code>
 May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverter
-<br/>INFO:  Created new converter for class UserDetailsTO
+  INFO:  Created new converter for class UserDetailsTO
 <br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
 <br/>INFO: Setting target field 'name' value : Novanc
 <br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
