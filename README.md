@@ -19,7 +19,7 @@ public class Account {
 <br /> And the following transfer object class:
 <code>
 <br/>
-@TransferObject(sourceClass=Account.class)
+<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b>
 <br/>
  public class AccountTO{
 <br/>
