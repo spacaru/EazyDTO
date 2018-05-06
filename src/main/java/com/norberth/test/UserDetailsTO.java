@@ -10,6 +10,8 @@ public class UserDetailsTO {
     private String name;
     @TransferObjectAttribute(sourceField = "email")
     private String email;
+    @TransferObjectAttribute(sourceField = "simpleDTO.fullName")
+    private String simpleDtoFullName;
     @TransferObjectAttribute(sourceField = "name", concatFields = {"surname", "email", "age"}, separator = ";")
     private String nameAndSurname;
 
@@ -18,6 +20,7 @@ public class UserDetailsTO {
         return "UserDetailsTO{" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", simpleDtoFullName='" + simpleDtoFullName + '\'' +
                 ", nameAndSurname='" + nameAndSurname + '\'' +
                 '}';
     }

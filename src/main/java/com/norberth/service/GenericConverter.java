@@ -81,20 +81,17 @@ public class GenericConverter {
         for (Field f : fields) {
             if (f.getAnnotation(TransferObjectAttribute.class) != null) {
                 String sourceField = f.getAnnotation(TransferObjectAttribute.class).sourceField();
-
                 boolean inheritedField = f.getAnnotation(TransferObjectAttribute.class).inheritedField();
                 String[] concatFields = f.getAnnotation(TransferObjectAttribute.class).concatFields();
                 String separator = f.getAnnotation(TransferObjectAttribute.class).separator();
-
                 Field field = null;
                 Field targetObjectField = null;
                 Object value = null;
-
-
                 if (sourceField.contains(ConverterConfig.getNameDelimiter())) {
                     String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                    field = getField(split, source, target.getClass().getDeclaredField(f.getName()).getName());
-
+                    while (split.length > 0) {
+                        field = getField(split, source, split[split.length - 1]);
+                    }
                     Field childField = source.getClass().getDeclaredField(split[0]);
                     childField.setAccessible(true);
                     Object val = childField.get(source);
@@ -112,7 +109,7 @@ public class GenericConverter {
                     targetObjectField = target.getClass().getDeclaredField(f.getName());
                     targetObjectField.setAccessible(true);
 
-                    if (!sourceField.contains(".")) {
+                    if (!sourceField.contains(ConverterConfig.getNameDelimiter())) {
                         value = getFieldValue(field, source);
                     }
                     if (GenericConverterManager.isDebug()) {

@@ -1,7 +1,9 @@
 package com.norberth.config;
+
 /**
  * @author Novanc Norberth
  * @version 1.0.0
+ * Utility class for grouping certain string settings
  */
 public abstract class ConverterConfig {
 

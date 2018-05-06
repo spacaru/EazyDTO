@@ -15,7 +15,7 @@ public class Main {
         System.out.println("Initialized GenericConverterManager");
 
 //        Testing the manager
-        UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norberth.novanc@gmail.com", "password", "Norberth");
+        UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norberth.novanc@gmail.com", "password", "Norberth", new SimpleDTO("Novanc Norberth Gabriel"));
         UserDetailsTO userDetailsTO = (UserDetailsTO) gcm.getConverter(UserDetailsTO.class).getTo(userDetails);
         System.out.println(userDetails);
         System.out.println(userDetailsTO);

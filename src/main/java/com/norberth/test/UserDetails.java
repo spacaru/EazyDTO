@@ -9,13 +9,15 @@ public class UserDetails {
     private String email;
     private String password;
     private String surname;
+    private SimpleDTO simpleDTO;
 
-    public UserDetails(String name, BigInteger age, String email, String password, String surname) {
+    public UserDetails(String name, BigInteger age, String email, String password, String surname, SimpleDTO simpleDTO) {
         this.name = name;
         this.age = age;
         this.email = email;
         this.password = password;
         this.surname = surname;
+        this.simpleDTO = simpleDTO;
     }
 
     @Override
