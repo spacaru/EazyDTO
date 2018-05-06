@@ -19,8 +19,8 @@ public class Account {
 </code>
 <br /> And the following transfer object class:
 <code>
-<br/>
-<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b>
+<div>
+<b style={'color':'red'}>@TransferObject(sourceClass=Account.class)</b></div>
 <br/>
  public class AccountTO{
 <br/>
@@ -53,12 +53,12 @@ UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norbe
 <code>
 May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverter
   INFO:  Created new converter for class UserDetailsTO
-<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
-<br/>INFO: Setting target field 'name' value : Novanc
-<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
-<br/>INFO: Setting target field 'email' value : norberth.novanc@gmail.com
-<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter concatFieldsAndSetValue
-<br/>INFO: Setting target field 'nameAndSurname' value : Novanc;Norberth;norberth.novanc@gmail.com;27
-<br/>UserDetails{name='Novanc', age=27, email='norberth.novanc@gmail.com', password='password', surname='Norberth'}
-<br/>UserDetailsTO{name='Novanc', email='norberth.novanc@gmail.com', nameAndSurname='Novanc;Norberth;norberth.novanc@gmail.com;27'}
+<div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues</div>
+<div>INFO: Setting target field 'name' value : Novanc</div>
+<div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues</div>
+<div>INFO: Setting target field 'email' value : norberth.novanc@gmail.com</div>
+<div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter concatFieldsAndSetValue</div>
+<div>INFO: Setting target field 'nameAndSurname' value : Novanc;Norberth;norberth.novanc@gmail.com;27</div>
+<div>UserDetails{name='Novanc', age=27, email='norberth.novanc@gmail.com', password='password', surname='Norberth'}</div>
+<div>UserDetailsTO{name='Novanc', email='norberth.novanc@gmail.com', nameAndSurname='Novanc;Norberth;norberth.novanc@gmail.com;27'}
 </code>
