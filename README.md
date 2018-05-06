@@ -43,7 +43,7 @@ public class Account {
 <h2> Transfer object example class </h2>
 <code>
 @TransferObject(sourceClass = UserDetails.class)
-public class UserDetailsTO {
+<br/> public class UserDetailsTO {
 
     @TransferObjectAttribute(sourceField = "name")
     private String name;
