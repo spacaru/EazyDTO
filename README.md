@@ -20,6 +20,38 @@ usage :
        
 </code>
 
+<h2> Entity class </h2>
+<code>
+public class UserDetails {
+
+    private String name;
+    private BigInteger age;
+    private String email;
+    private String password;
+    private String surname;
+    private SimpleDTO simpleDTO;
+
+    public UserDetails(String name, BigInteger age, String email, String password, String surname, SimpleDTO simpleDTO) {
+        this.name = name;
+        this.age = age;
+        this.email = email;
+        this.password = password;
+        this.surname = surname;
+        this.simpleDTO = simpleDTO;
+    }
+
+    @Override
+    public String toString() {
+        return "UserDetails{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", surname='" + surname + '\'' +
+                '}';
+    }
+}
+</code>
 <h2> Transfer object example class </h2>
 <code>
 @TransferObject(sourceClass = UserDetails.class)
@@ -57,9 +89,9 @@ UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norbe
                 </code>
                 
 <h4>Output </h4>
-<code>
-May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverter
-  INFO:  Created new converter for class UserDetailsTO
+
+<div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverter</div>
+ <div> INFO:  Created new converter for class UserDetailsTO</div>
 <div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues</div>
 <div>INFO: Setting target field 'name' value : Novanc</div>
 <div>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues</div>
@@ -68,4 +100,3 @@ May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverte
 <div>INFO: Setting target field 'nameAndSurname' value : Novanc;Norberth;norberth.novanc@gmail.com;27</div>
 <div>UserDetails{name='Novanc', age=27, email='norberth.novanc@gmail.com', password='password', surname='Norberth'}</div>
 <div>UserDetailsTO{name='Novanc', email='norberth.novanc@gmail.com', nameAndSurname='Novanc;Norberth;norberth.novanc@gmail.com;27'}
-</code>
