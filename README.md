@@ -25,13 +25,13 @@ UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norbe
 <h4>Output </h4>
 <code>
 May 06, 2018 4:55:51 PM com.norberth.service.GenericConverterManager getConverter
-<br>INFO:  Created new converter for class UserDetailsTO
-<br>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
-<br>INFO: Setting target field 'name' value : Novanc
-<br>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
-<br>INFO: Setting target field 'email' value : norberth.novanc@gmail.com
-<br>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter concatFieldsAndSetValue
-<br>INFO: Setting target field 'nameAndSurname' value : Novanc;Norberth;norberth.novanc@gmail.com;27
-<br>UserDetails{name='Novanc', age=27, email='norberth.novanc@gmail.com', password='password', surname='Norberth'}
-<br>UserDetailsTO{name='Novanc', email='norberth.novanc@gmail.com', nameAndSurname='Novanc;Norberth;norberth.novanc@gmail.com;27'}
+<br/>INFO:  Created new converter for class UserDetailsTO
+<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
+<br/>INFO: Setting target field 'name' value : Novanc
+<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter tryToSetFieldValues
+<br/>INFO: Setting target field 'email' value : norberth.novanc@gmail.com
+<br/>May 06, 2018 4:55:51 PM com.norberth.service.GenericConverter concatFieldsAndSetValue
+<br/>INFO: Setting target field 'nameAndSurname' value : Novanc;Norberth;norberth.novanc@gmail.com;27
+<br/>UserDetails{name='Novanc', age=27, email='norberth.novanc@gmail.com', password='password', surname='Norberth'}
+<br/>UserDetailsTO{name='Novanc', email='norberth.novanc@gmail.com', nameAndSurname='Novanc;Norberth;norberth.novanc@gmail.com;27'}
 </code>
