@@ -1,4 +1,5 @@
-# entity2transferobject
+# Entity2TO
+
 An easy to use Entity to Transfer Object mapper
 
 
@@ -23,7 +24,7 @@ public class Account {
 <br/>
  public class AccountTO{
 <br/>
- @TransferObjectAttribute(sourceField='name')
+ <b>@TransferObjectAttribute(sourceField='name')</b>
 <br/>
   private String nameProperty;
 </code>
