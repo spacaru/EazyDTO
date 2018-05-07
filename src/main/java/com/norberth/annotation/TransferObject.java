@@ -19,4 +19,6 @@ public @interface TransferObject {
      * @return - source entity class
      */
     public Class sourceClass();
+
+    public boolean hasIdField() default false;
 }

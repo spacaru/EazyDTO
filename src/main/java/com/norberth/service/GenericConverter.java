@@ -2,18 +2,26 @@ package com.norberth.service;
 
 import com.norberth.annotation.TransferObject;
 import com.norberth.annotation.TransferObjectAttribute;
+import com.norberth.annotation.TransferObjectID;
 import com.norberth.config.ConverterConfig;
+import com.norberth.validator.Action;
+import com.norberth.validator.SourceFieldValidator;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import javax.persistence.Id;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.norberth.validator.Action.SET_FIELDS;
 
 /**
  * @author Novanc Norberth
@@ -47,7 +55,8 @@ public class GenericConverter {
             if (c.equals(type)) {
                 try {
                     t = type.newInstance();
-                    setFieldValues(c.getDeclaredFields(), source, t);
+                    Annotation transferObject = c.getAnnotation(TransferObject.class);
+                    setFieldValues(c.getDeclaredFields(), source, t, ((TransferObject) transferObject).hasIdField());
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
                     e.printStackTrace();
@@ -76,7 +85,7 @@ public class GenericConverter {
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    public void setFieldValues(Field[] fields, Object source, Object target) throws NoSuchFieldException, IllegalAccessException {
+    public void setFieldValues(Field[] fields, Object source, Object target, boolean hasId) throws NoSuchFieldException, IllegalAccessException {
 
         for (Field f : fields) {
             if (f.getAnnotation(TransferObjectAttribute.class) != null) {
@@ -84,42 +93,55 @@ public class GenericConverter {
                 boolean inheritedField = f.getAnnotation(TransferObjectAttribute.class).inheritedField();
                 String[] concatFields = f.getAnnotation(TransferObjectAttribute.class).concatFields();
                 String separator = f.getAnnotation(TransferObjectAttribute.class).separator();
+
+                SourceFieldValidator sourceFieldValidator = new SourceFieldValidator();
+                Action action = sourceFieldValidator.getAction(sourceField);
                 Field field = null;
-                Field targetObjectField = null;
-                Object value = null;
-                if (sourceField.contains(ConverterConfig.getNameDelimiter())) {
-                    String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                    while (split.length > 0) {
-                        field = getField(split, source, split[split.length - 1]);
-                    }
-                    Field childField = source.getClass().getDeclaredField(split[0]);
-                    childField.setAccessible(true);
-                    Object val = childField.get(source);
-                    value = getFieldValue(field, val);
-                } else if (!inheritedField) {
-                    field = source.getClass().getDeclaredField(sourceField);
-                } else {
+                if (inheritedField) {
                     field = source.getClass().getSuperclass().getDeclaredField(sourceField);
                 }
+                Field targetObjectField = null;
+                Object value = null;
+                switch (action) {
+                    case SET_FIELDS:
+                        field = source.getClass().getDeclaredField(sourceField);
+                        targetObjectField = target.getClass().getDeclaredField(f.getName());
+                        break;
+                    case RECURSIVELY_SET_FIELDS:
+                        String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
+                        while (split.length > 0) {
+                            field = getField(split, source, split[split.length - 1]);
+                        }
+                        Field childField = source.getClass().getDeclaredField(split[0]);
+                        childField.setAccessible(true);
+                        Object val = childField.get(source);
+                        value = getFieldValue(field, val);
+                        break;
+                }
+
+                field.setAccessible(true);
+                targetObjectField.setAccessible(true);
                 if (concatFields.length > 0 && !concatFields[0].isEmpty()) {
                     concatFieldsAndSetValue(source, target, f, sourceField, concatFields, value, separator);
-                } else {
-//                set fields as accesible
-                    field.setAccessible(true);
-                    targetObjectField = target.getClass().getDeclaredField(f.getName());
-                    targetObjectField.setAccessible(true);
+                }
+                if (!sourceField.contains(ConverterConfig.getNameDelimiter())) {
+                    value = getFieldValue(field, source);
+                }
+                if (GenericConverterManager.isDebug()) {
+                    Annotation targetTOAnnotation = targetObjectField.getAnnotation(TransferObjectID.class);
+                    if (targetTOAnnotation == null) {
+                        if (GenericConverterManager.isDebug()) {
+                            logger.log(Level.WARNING, "Detected @TransferObjectID annotation on field : " + targetObjectField.getName());
+                        }
+                    }
 
-                    if (!sourceField.contains(ConverterConfig.getNameDelimiter())) {
-                        value = getFieldValue(field, source);
-                    }
-                    if (GenericConverterManager.isDebug()) {
-                        logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
-                    }
+                    logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
                     targetObjectField.set(target, value);
                 }
 
             }
         }
+
     }
 
     @Override
