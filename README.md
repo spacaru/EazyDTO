@@ -16,7 +16,7 @@ usage :
         <code>gcm.setDebug(true);</code><br/>
         <code> gcm.setPackageName("com.norberth.test"); </code><br/>
 
-<h3> Accessing type specific generic convertors </h3>
+<h3> Generic converter usage </h3>
        <code>GenericConverter userDetailsConverter = gcm.getConverter(UserDetailsTO.class);</code><br/>
        <code>userDetailsConverter.getToList(Arrays.asList(userDetails, secUSer, secUser21, hjfkrsd));</code><br/>
        <code> <span>userDetailsConverter.getToList(someList) - returns List of transfer objects for the specified type from the sourceList </span></code><br/>
