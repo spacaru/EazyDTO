@@ -17,10 +17,10 @@ usage :
         <code> gcm.setPackageName("com.norberth.test"); </code><br/>
 
 <h3> Accessing type specific generic convertors </h3>
-       <code>gcm.getConverter(UserDetailsTO.class);</code><br/>
-       <code>gcm.getToList(Arrays.asList(userDetails, secUSer, secUser21, hjfkrsd));</code><br/>
-       <code> <span>gc.getToList(someList) - returns List of transfer objects for the specified type from the sourceList </span></code><br/>
-        <code><span>gc.getToListSortBy(someList,sortAttribute) - returns List of transfer objects created from sourceList sorted by the given attribute. throws an error if attribute is not found sourceList elements </span>
+       <code>GenericConverter userDetailsConverter = gcm.getConverter(UserDetailsTO.class);</code><br/>
+       <code>userDetailsConverter.getToList(Arrays.asList(userDetails, secUSer, secUser21, hjfkrsd));</code><br/>
+       <code> <span>userDetailsConverter.getToList(someList) - returns List of transfer objects for the specified type from the sourceList </span></code><br/>
+        <code><span>userDetailsConverter.getToListSortBy(someList,sortAttribute) - returns List of transfer objects created from sourceList sorted by the given attribute. throws an error if attribute is not found sourceList elements </span>
         </code><br/>
 </code>
 <h2> Entity class </h2>
