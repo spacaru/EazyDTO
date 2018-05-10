@@ -1,16 +1,19 @@
 package com.norberth.test;
 
+import java.util.List;
+
 public class SimpleDTO {
 
     private String fullName;
 
-    private ComplicatedEntity complicatedEntity;
+    private List<ComplicatedEntity> complicatedEntity;
 
     public SimpleDTO(String fullName) {
         this.fullName = fullName;
     }
 
-    public SimpleDTO(String fullName, ComplicatedEntity complicatedEntity) {
+
+    public SimpleDTO(String fullName, List<ComplicatedEntity> complicatedEntity) {
         this.fullName = fullName;
         this.complicatedEntity = complicatedEntity;
     }
@@ -27,6 +30,7 @@ public class SimpleDTO {
     public String toString() {
         return "SimpleDTO{" +
                 "fullName='" + fullName + '\'' +
+                ", complicatedEntity=" + complicatedEntity +
                 '}';
     }
 }

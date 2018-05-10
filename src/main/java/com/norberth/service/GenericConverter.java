@@ -1,8 +1,10 @@
 package com.norberth.service;
 
+import com.norberth.annotation.MapListProperty;
 import com.norberth.annotation.TransferObject;
 import com.norberth.annotation.TransferObjectAttribute;
 import com.norberth.config.ConverterConfig;
+import com.norberth.util.ObjectComparator;
 import com.norberth.validator.Action;
 import com.norberth.validator.SourceFieldValidator;
 import org.reflections.Reflections;
@@ -71,15 +73,35 @@ public class GenericConverter {
         return t;
     }
 
-
+    /**
+     * @param sourceList
+     * @return
+     */
     public List<Object> getToList(List sourceList) {
-        List retList = new ArrayList();
+        List<Object> retList = new ArrayList<>();
         for (Object sourceObj : sourceList) {
             retList.add(getTo(sourceObj));
         }
         retList.removeAll(Collections.singleton(null));
         return retList;
     }
+
+
+    /**
+     * @param sourceList
+     * @param attribute
+     * @return
+     */
+    public List<Object> getToListSortBy(List sourceList, String attribute) {
+        List<Object> retList = new ArrayList<>();
+        for (Object sourceObj : sourceList) {
+            retList.add(getTo(sourceObj));
+        }
+        retList.removeAll(Collections.singleton(null));
+        Collections.sort(retList, new ObjectComparator(attribute));
+        return retList;
+    }
+
 
     /**
      * Sets values for list of {@link Field} annotated with {@link TransferObjectAttribute} on classes annotated with {@link TransferObject}
@@ -117,17 +139,24 @@ public class GenericConverter {
                     case RECURSIVELY_SET_FIELDS:
                         String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
                         field = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
-                        if (field == null) {
-                            logger.severe("Field not found or empty in source class " + source.getClass().getSimpleName());
+                        if (f.getAnnotation(MapListProperty.class) != null) {
+                            value = getListValues(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
+                        }
+                        if (field == null && value == null) {
+                            if (GenericConverterManager.isDebug())
+                                logger.severe("Field not found or empty in source class " + source.getClass().getSimpleName());
                             continue;
                         }
                         currentSource = getSourceRecursively(new ArrayList<>(Arrays.asList(split)), source);
                         targetObjectField = target.getClass().getDeclaredField(f.getName());
-                        value = getFieldValue(field, currentSource);
+                        if (value == null) {
+                            value = getFieldValue(field, currentSource);
+                        }
                         break;
                 }
-
-                field.setAccessible(true);
+                if (field != null) {
+                    field.setAccessible(true);
+                }
                 targetObjectField.setAccessible(true);
                 if (concatFields.length > 0 && !concatFields[0].isEmpty()) {
                     concatFieldsAndSetValue(currentSource, target, f, field.getName(), concatFields, value, separator);
@@ -142,6 +171,59 @@ public class GenericConverter {
             }
         }
 
+    }
+
+    private Object getListValues(ArrayList<String> sourceList, Object source, String name) {
+        ListIterator<String> stringListIterator = sourceList.listIterator();
+        Field f = null;
+        try {
+            while (stringListIterator.hasNext()) {
+                if (!error) {
+                    String currentField = stringListIterator.next();
+                    stringListIterator.remove();
+                    if (!stringListIterator.hasNext()) {
+                        if (source instanceof List) {
+                            List newList = new ArrayList();
+                            for (Object obj : (List) source) {
+                                Object sourceObject = obj.getClass().newInstance();
+                                Field sourceField = sourceObject.getClass().getDeclaredField(name);
+                                sourceField.setAccessible(true);
+                                Object value = sourceField.get(obj);
+                                Object targetObject = null;
+                                if (sourceField.getType().isPrimitive()) {
+                                    targetObject = value;
+                                } else {
+                                    Object newObject = sourceField.getType().newInstance();
+                                    sourceField.set(newObject, value);
+                                }
+                                newList.add(targetObject);
+                            }
+                            return newList;
+                        } else {
+                            return null;
+                        }
+
+                    } else {
+                        Field targetField = source.getClass().getDeclaredField(currentField);
+                        targetField.setAccessible(true);
+                        Object newSource = targetField.get(source);
+                        Object retObject = null;
+                        retObject = getListValues(sourceList, newSource, name);
+                        return retObject;
+                    }
+                } else {
+                    return f;
+                }
+            }
+        } catch (NoSuchFieldException e) {
+//            this.error = true;
+            return f;
+        } catch (IllegalAccessException e) {
+            return f;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return f;
     }
 
     @Override
@@ -203,6 +285,7 @@ public class GenericConverter {
                     if (!stringListIterator.hasNext()) {
                         if (source != null) {
                             f = source.getClass().getDeclaredField(currentField);
+                            this.error = false;
                             return f;
                         } else {
                             return null;
@@ -219,7 +302,7 @@ public class GenericConverter {
                 }
             }
         } catch (NoSuchFieldException e) {
-            this.error = true;
+//            this.error = true;
             return f;
         } catch (IllegalAccessException e) {
             return f;
