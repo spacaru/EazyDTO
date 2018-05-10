@@ -16,9 +16,9 @@ usage :
         <code>gcm.setDebug(true);</code><br/>
         <code> gcm.setPackageName("com.norberth.test"); </code><br/>
 
-<h3> Generic converter init </h3>
-<code>
-        GenericConverter gc = new GenericConverter(SomeClassTO.class);</code><br/>
+<h3> Accessing type specific generic convertors </h3>
+       <code>gcm.getConverter(UserDetailsTO.class);</code><br/>
+       <code>gcm.getToList(Arrays.asList(userDetails, secUSer, secUser21, hjfkrsd));</code><br/>
        <code> <span>gc.getToList(someList) - returns List of transfer objects for the specified type from the sourceList </span></code><br/>
         <code><span>gc.getToListSortBy(someList,sortAttribute) - returns List of transfer objects created from sourceList sorted by the given attribute. throws an error if attribute is not found sourceList elements </span>
         </code><br/>
