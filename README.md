@@ -20,6 +20,13 @@ usage :
        
 </code>
 
+<h3> Generic converter init </h3>
+<code>
+        GenericConverter gc = new GenericConverter(SomeClassTO.class);</code><br/>
+       <code> <span>gc.getToList(someList) - returns List of transfer objects for the specified type from the sourceList </span></code><br/>
+        <code><span>gc.getToListSortBy(someList,sortAttribute) - returns List of transfer objects created from sourceList sorted by the given attribute. throws an error if attribute is not found sourceList elements </span>
+        </code><br/>
+</code>
 <h2> Entity class </h2>
 <code>
 public class UserDetails {
