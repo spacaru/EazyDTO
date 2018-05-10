@@ -2,7 +2,6 @@ package com.norberth.service;
 
 import com.norberth.annotation.TransferObject;
 import com.norberth.annotation.TransferObjectAttribute;
-import com.norberth.annotation.TransferObjectID;
 import com.norberth.config.ConverterConfig;
 import com.norberth.validator.Action;
 import com.norberth.validator.SourceFieldValidator;
@@ -27,6 +26,7 @@ public class GenericConverter {
     private Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
     private final Class type;
     private String packageName;
+    private boolean error = false;
 
     public GenericConverter(Class type, String packageName) {
         this.type = type;
@@ -71,6 +71,16 @@ public class GenericConverter {
         return t;
     }
 
+
+    public List<Object> getToList(List sourceList) {
+        List retList = new ArrayList();
+        for (Object sourceObj : sourceList) {
+            retList.add(getTo(sourceObj));
+        }
+        retList.removeAll(Collections.singleton(null));
+        return retList;
+    }
+
     /**
      * Sets values for list of {@link Field} annotated with {@link TransferObjectAttribute} on classes annotated with {@link TransferObject}
      *
@@ -80,8 +90,9 @@ public class GenericConverter {
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    public void setFieldValues(Field[] fields, Object source, Object target, boolean hasId) throws NoSuchFieldException, IllegalAccessException {
+    private void setFieldValues(Field[] fields, Object source, Object target, boolean hasId) throws NoSuchFieldException, IllegalAccessException {
 
+        Object currentSource = null;
         for (Field f : fields) {
             if (f.getAnnotation(TransferObjectAttribute.class) != null) {
                 String sourceField = f.getAnnotation(TransferObjectAttribute.class).sourceField();
@@ -101,20 +112,25 @@ public class GenericConverter {
                     case SET_FIELDS:
                         field = source.getClass().getDeclaredField(sourceField);
                         targetObjectField = target.getClass().getDeclaredField(f.getName());
+                        currentSource = source;
                         break;
                     case RECURSIVELY_SET_FIELDS:
                         String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
                         field = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
-                        Object newSource = getSourceRecursively(new ArrayList<>(Arrays.asList(split)), source);
+                        if (field == null) {
+                            logger.severe("Field not found or empty in source class " + source.getClass().getSimpleName());
+                            continue;
+                        }
+                        currentSource = getSourceRecursively(new ArrayList<>(Arrays.asList(split)), source);
                         targetObjectField = target.getClass().getDeclaredField(f.getName());
-                        value = getFieldValue(field, newSource);
+                        value = getFieldValue(field, currentSource);
                         break;
                 }
 
                 field.setAccessible(true);
                 targetObjectField.setAccessible(true);
                 if (concatFields.length > 0 && !concatFields[0].isEmpty()) {
-                    concatFieldsAndSetValue(source, target, f, sourceField, concatFields, value, separator);
+                    concatFieldsAndSetValue(currentSource, target, f, field.getName(), concatFields, value, separator);
                 }
                 if (!sourceField.contains(ConverterConfig.getNameDelimiter())) {
                     value = getFieldValue(field, source);
@@ -126,31 +142,6 @@ public class GenericConverter {
             }
         }
 
-    }
-
-    private Object getSourceRecursively(ArrayList<String> strings, Object source) {
-        ListIterator<String> stringListIterator = strings.listIterator();
-        Object sourceObject = null;
-        try {
-            while (stringListIterator.hasNext()) {
-                String currentField = stringListIterator.next();
-                stringListIterator.remove();
-                if (!stringListIterator.hasNext()) {
-                    return source;
-
-                } else {
-                    Field f = source.getClass().getDeclaredField(currentField);
-                    f.setAccessible(true);
-                    Object newSource = f.get(source);
-                    sourceObject = getSourceRecursively(strings, newSource);
-                }
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return sourceObject;
     }
 
     @Override
@@ -169,6 +160,71 @@ public class GenericConverter {
 
     public Class getType() {
         return type;
+    }
+
+
+    private Object getSourceRecursively(ArrayList<String> strings, Object source) {
+        ListIterator<String> stringListIterator = strings.listIterator();
+        Object sourceObject = null;
+        try {
+            while (stringListIterator.hasNext()) {
+                if (!error) {
+                    String currentField = stringListIterator.next();
+                    stringListIterator.remove();
+                    if (!stringListIterator.hasNext()) {
+                        return source;
+
+                    } else {
+                        Field f = source.getClass().getDeclaredField(currentField);
+                        f.setAccessible(true);
+                        Object newSource = f.get(source);
+                        sourceObject = getSourceRecursively(strings, newSource);
+                    }
+                } else {
+                    return sourceObject;
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return sourceObject;
+    }
+
+    private Field getFieldResursively(List<String> sourceList, Object source, String name) {
+        ListIterator<String> stringListIterator = sourceList.listIterator();
+        Field f = null;
+        try {
+            while (stringListIterator.hasNext()) {
+                if (!error) {
+                    String currentField = stringListIterator.next();
+                    stringListIterator.remove();
+                    if (!stringListIterator.hasNext()) {
+                        if (source != null) {
+                            f = source.getClass().getDeclaredField(currentField);
+                            return f;
+                        } else {
+                            return null;
+                        }
+
+                    } else {
+                        Field targetField = source.getClass().getDeclaredField(currentField);
+                        targetField.setAccessible(true);
+                        Object newSource = targetField.get(source);
+                        f = getFieldResursively(sourceList, newSource, name);
+                    }
+                } else {
+                    return f;
+                }
+            }
+        } catch (NoSuchFieldException e) {
+            this.error = true;
+            return f;
+        } catch (IllegalAccessException e) {
+            return f;
+        }
+        return f;
     }
 
     private void concatFieldsAndSetValue(Object source, Object target, Field f, String sourceField, String[] concatFields, Object value, String separator) throws NoSuchFieldException, IllegalAccessException {
@@ -194,46 +250,6 @@ public class GenericConverter {
         targetObjectField.set(target, value);
     }
 
-    private Field getField(String[] split, Object source, String name) throws NoSuchFieldException {
-        Field f = null;
-        Field parent = null;
-        for (String s : split) {
-            if (parent != null) {
-                f = parent.getType().getDeclaredField(s);
-                if (name.equals(f.getName())) {
-                    return f;
-                }
-            }
-            parent = source.getClass().getDeclaredField(s);
-        }
-        return f;
-    }
-
-    private Field getFieldResursively(List<String> sourceList, Object source, String name) {
-        ListIterator<String> stringListIterator = sourceList.listIterator();
-        Field f = null;
-        try {
-            while (stringListIterator.hasNext()) {
-                String currentField = stringListIterator.next();
-                stringListIterator.remove();
-                if (!stringListIterator.hasNext()) {
-                    f = source.getClass().getDeclaredField(currentField);
-                    return f;
-
-                } else {
-                    Field targetField = source.getClass().getDeclaredField(currentField);
-                    targetField.setAccessible(true);
-                    Object newSource = targetField.get(source);
-                    f = getFieldResursively(sourceList, newSource, name);
-                }
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return f;
-    }
 
     private Object getFieldValue(Field field, Object source) throws IllegalAccessException {
         Object value = null;
