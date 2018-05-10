@@ -12,13 +12,9 @@ usage :
 </ul>
 
 <h2>Converter manager initialization</h2>
-
-<code>
-        GenericConverterManager gcm = GenericConverterManager.getInstance();
-       <br> gcm.setDebug(true);
-       <br> gcm.setPackageName("com.norberth.test");
-       
-</code>
+        <code>GenericConverterManager gcm = GenericConverterManager.getInstance();</code><br/>
+        <code>gcm.setDebug(true);</code><br/>
+        <code> gcm.setPackageName("com.norberth.test"); </code><br/>
 
 <h3> Generic converter init </h3>
 <code>
