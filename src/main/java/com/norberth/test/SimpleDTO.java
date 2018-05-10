@@ -1,16 +1,18 @@
 package com.norberth.test;
 
-import com.norberth.annotation.TransferObject;
-import com.norberth.annotation.TransferObjectAttribute;
-
-//@TransferObject(sourceClass = UserDetails.class)
 public class SimpleDTO {
 
-//    @TransferObjectAttribute(sourceField = "name", concatFields = {"surname"})
     private String fullName;
+
+    private ComplicatedEntity complicatedEntity;
 
     public SimpleDTO(String fullName) {
         this.fullName = fullName;
+    }
+
+    public SimpleDTO(String fullName, ComplicatedEntity complicatedEntity) {
+        this.fullName = fullName;
+        this.complicatedEntity = complicatedEntity;
     }
 
     public String getFullName() {
