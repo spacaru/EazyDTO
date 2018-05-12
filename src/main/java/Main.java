@@ -19,15 +19,15 @@ public class Main {
         System.out.println("Initialized GenericConverterManager");
 
 //        Testing the manager
-        UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norberth.novanc@gmail.com", "password", "Norberth", new SimpleDTO("Novanc Norberth Gabriel", Arrays.asList(new ComplicatedEntity(1), new ComplicatedEntity(2), new ComplicatedEntity(4))));
+        UserDetails userDetails = new UserDetails("Novanc", new BigInteger("27"), "norberth.novanc@gmail.com", "password", "Norberth", new SimpleDTO("Novanc Norberth Gabriel", Arrays.asList(new ComplicatedEntity(), new ComplicatedEntity(), new ComplicatedEntity())));
         UserDetailsTO userDetailsTO = (UserDetailsTO) gcm.getConverter(UserDetailsTO.class).getTo(userDetails);
-        UserDetails secUSer = new UserDetails("123", new BigInteger("34"), "andreea.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(1), new ComplicatedEntity(2), new ComplicatedEntity(4))));
-        UserDetails secUser21 = new UserDetails("123", new BigInteger("34"), "bbb.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(1), new ComplicatedEntity(2), new ComplicatedEntity(4))));
-        UserDetails hjfkrsd = new UserDetails("123", new BigInteger("34"), "bbb.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(1), new ComplicatedEntity(2), new ComplicatedEntity(4))));
+        UserDetails secUSer = new UserDetails("123", new BigInteger("34"), "andreea.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(), new ComplicatedEntity(), new ComplicatedEntity())));
+        UserDetails secUser21 = new UserDetails("123", new BigInteger("34"), "bbb.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(), new ComplicatedEntity(), new ComplicatedEntity())));
+        UserDetails hjfkrsd = new UserDetails("123", new BigInteger("34"), "bbb.barani@gmail.com", "%43", "654", new SimpleDTO("123", Arrays.asList(new ComplicatedEntity(), new ComplicatedEntity(), new ComplicatedEntity())));
         List<UserDetailsTO> userDetailsTOList = (List) gcm.getConverter(UserDetailsTO.class).getToList(Arrays.asList(userDetails, secUSer, secUser21, hjfkrsd));
         GenericConverter userDetailsConverter = gcm.getConverter(UserDetailsTO.class);
-        System.out.println(userDetailsTOList);
         System.out.println(userDetails);
         System.out.println(userDetailsTO);
+        System.out.println(userDetailsTOList);
     }
 }

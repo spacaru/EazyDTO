@@ -1,12 +1,12 @@
 package com.norberth.service;
 
-import com.norberth.annotation.MapListProperty;
-import com.norberth.annotation.TransferObject;
-import com.norberth.annotation.TransferObjectAttribute;
+import com.norberth.annotation.MapListAttribute;
+import com.norberth.annotation.MapObject;
+import com.norberth.annotation.MapObjectAttribute;
 import com.norberth.config.ConverterConfig;
 import com.norberth.util.ObjectComparator;
 import com.norberth.validator.Action;
-import com.norberth.validator.SourceFieldValidator;
+import com.norberth.validator.ObjectMapper;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -46,14 +46,14 @@ public class GenericConverter {
                 .setUrls(ClasspathHelper.forPackage(this.packageName))
                 .setScanners(new SubTypesScanner(),
                         new TypeAnnotationsScanner()));
-        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(TransferObject.class);
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(MapObject.class);
         Object t = null;
         for (Class c : annotatedClasses) {
             if (c.equals(type)) {
                 try {
                     t = type.newInstance();
-                    Annotation transferObject = c.getAnnotation(TransferObject.class);
-                    setFieldValues(c.getDeclaredFields(), source, t, ((TransferObject) transferObject).hasIdField());
+                    Annotation transferObject = c.getAnnotation(MapObject.class);
+                    setFieldValues(c.getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
                     e.printStackTrace();
@@ -68,7 +68,7 @@ public class GenericConverter {
             }
         }
         if (t == null && GenericConverterManager.isDebug()) {
-            logger.log(Level.WARNING, " No class of type" + type + " found annotated with @TransferObject annotation.");
+            logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
         }
         return t;
     }
@@ -104,7 +104,7 @@ public class GenericConverter {
 
 
     /**
-     * Sets values for list of {@link Field} annotated with {@link TransferObjectAttribute} on classes annotated with {@link TransferObject}
+     * Sets values for list of {@link Field} annotated with {@link MapObjectAttribute} on classes annotated with {@link MapObject}
      *
      * @param fields
      * @param source
@@ -115,116 +115,40 @@ public class GenericConverter {
     private void setFieldValues(Field[] fields, Object source, Object target, boolean hasId) throws NoSuchFieldException, IllegalAccessException {
 
         Object currentSource = null;
+        ObjectMapper objectMapper = new ObjectMapper();
         for (Field f : fields) {
-            if (f.getAnnotation(TransferObjectAttribute.class) != null) {
-                String sourceField = f.getAnnotation(TransferObjectAttribute.class).sourceField();
-                boolean inheritedField = f.getAnnotation(TransferObjectAttribute.class).inheritedField();
-                String[] concatFields = f.getAnnotation(TransferObjectAttribute.class).concatFields();
-                String separator = f.getAnnotation(TransferObjectAttribute.class).separator();
-
-                SourceFieldValidator sourceFieldValidator = new SourceFieldValidator();
-                Action action = sourceFieldValidator.getAction(sourceField);
-                Field field = null;
-                if (inheritedField) {
-                    field = source.getClass().getSuperclass().getDeclaredField(sourceField);
-                }
-                Field targetObjectField = null;
-                Object value = null;
-                switch (action) {
-                    case SET_FIELDS:
-                        field = source.getClass().getDeclaredField(sourceField);
-                        targetObjectField = target.getClass().getDeclaredField(f.getName());
-                        currentSource = source;
-                        break;
-                    case RECURSIVELY_SET_FIELDS:
-                        String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                        field = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
-                        if (f.getAnnotation(MapListProperty.class) != null) {
-                            value = getListValues(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
-                        }
-                        if (field == null && value == null) {
-                            if (GenericConverterManager.isDebug())
-                                logger.severe("Field not found or empty in source class " + source.getClass().getSimpleName());
-                            continue;
-                        }
-                        currentSource = getSourceRecursively(new ArrayList<>(Arrays.asList(split)), source);
-                        targetObjectField = target.getClass().getDeclaredField(f.getName());
-                        if (value == null) {
-                            value = getFieldValue(field, currentSource);
-                        }
-                        break;
-                }
+            if (f.getAnnotation(MapObjectAttribute.class) != null) {
+                String sourceField = f.getAnnotation(MapObjectAttribute.class).sourceField();
+                boolean isInherited = f.getAnnotation(MapObjectAttribute.class).inheritedField();
+                String[] concatFields = f.getAnnotation(MapObjectAttribute.class).concatFields();
+                String separator = f.getAnnotation(MapObjectAttribute.class).separator();
+                Action action = objectMapper.getAction(sourceField);
+                Field field = objectMapper.getField(action, source, sourceField);
+                currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
+                Object value = objectMapper.getValue(field, currentSource, false, null,isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
                 if (field != null) {
                     field.setAccessible(true);
                 }
                 targetObjectField.setAccessible(true);
-                if (concatFields.length > 0 && !concatFields[0].isEmpty()) {
-                    concatFieldsAndSetValue(currentSource, target, f, field.getName(), concatFields, value, separator);
+                targetObjectField.set(target, value);
+            } else if (f.getAnnotation(MapListAttribute.class) != null) {
+                String sourceField = f.getAnnotation(MapListAttribute.class).sourceField();
+                boolean isInherited = f.getAnnotation(MapListAttribute.class).inheritedField();
+                Action action = objectMapper.getAction(sourceField);
+                Field field = objectMapper.getField(action, source, sourceField);
+                Object value = objectMapper.getValue(field, source, true, sourceField,isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                if (field != null) {
+                    field.setAccessible(true);
                 }
-                if (!sourceField.contains(ConverterConfig.getNameDelimiter())) {
-                    value = getFieldValue(field, source);
-                }
-                if (GenericConverterManager.isDebug()) {
-                    logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
-                }
+                targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
             }
         }
 
     }
 
-    private Object getListValues(ArrayList<String> sourceList, Object source, String name) {
-        ListIterator<String> stringListIterator = sourceList.listIterator();
-        Field f = null;
-        try {
-            while (stringListIterator.hasNext()) {
-                if (!error) {
-                    String currentField = stringListIterator.next();
-                    stringListIterator.remove();
-                    if (!stringListIterator.hasNext()) {
-                        if (source instanceof List) {
-                            List newList = new ArrayList();
-                            for (Object obj : (List) source) {
-                                Object sourceObject = obj.getClass().newInstance();
-                                Field sourceField = sourceObject.getClass().getDeclaredField(name);
-                                sourceField.setAccessible(true);
-                                Object value = sourceField.get(obj);
-                                Object targetObject = null;
-                                if (sourceField.getType().isPrimitive()) {
-                                    targetObject = value;
-                                } else {
-                                    Object newObject = sourceField.getType().newInstance();
-                                    sourceField.set(newObject, value);
-                                }
-                                newList.add(targetObject);
-                            }
-                            return newList;
-                        } else {
-                            return null;
-                        }
-
-                    } else {
-                        Field targetField = source.getClass().getDeclaredField(currentField);
-                        targetField.setAccessible(true);
-                        Object newSource = targetField.get(source);
-                        Object retObject = null;
-                        retObject = getListValues(sourceList, newSource, name);
-                        return retObject;
-                    }
-                } else {
-                    return f;
-                }
-            }
-        } catch (NoSuchFieldException e) {
-//            this.error = true;
-            return f;
-        } catch (IllegalAccessException e) {
-            return f;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
-        return f;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -244,71 +168,6 @@ public class GenericConverter {
         return type;
     }
 
-
-    private Object getSourceRecursively(ArrayList<String> strings, Object source) {
-        ListIterator<String> stringListIterator = strings.listIterator();
-        Object sourceObject = null;
-        try {
-            while (stringListIterator.hasNext()) {
-                if (!error) {
-                    String currentField = stringListIterator.next();
-                    stringListIterator.remove();
-                    if (!stringListIterator.hasNext()) {
-                        return source;
-
-                    } else {
-                        Field f = source.getClass().getDeclaredField(currentField);
-                        f.setAccessible(true);
-                        Object newSource = f.get(source);
-                        sourceObject = getSourceRecursively(strings, newSource);
-                    }
-                } else {
-                    return sourceObject;
-                }
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return sourceObject;
-    }
-
-    private Field getFieldResursively(List<String> sourceList, Object source, String name) {
-        ListIterator<String> stringListIterator = sourceList.listIterator();
-        Field f = null;
-        try {
-            while (stringListIterator.hasNext()) {
-                if (!error) {
-                    String currentField = stringListIterator.next();
-                    stringListIterator.remove();
-                    if (!stringListIterator.hasNext()) {
-                        if (source != null) {
-                            f = source.getClass().getDeclaredField(currentField);
-                            this.error = false;
-                            return f;
-                        } else {
-                            return null;
-                        }
-
-                    } else {
-                        Field targetField = source.getClass().getDeclaredField(currentField);
-                        targetField.setAccessible(true);
-                        Object newSource = targetField.get(source);
-                        f = getFieldResursively(sourceList, newSource, name);
-                    }
-                } else {
-                    return f;
-                }
-            }
-        } catch (NoSuchFieldException e) {
-//            this.error = true;
-            return f;
-        } catch (IllegalAccessException e) {
-            return f;
-        }
-        return f;
-    }
 
     private void concatFieldsAndSetValue(Object source, Object target, Field f, String sourceField, String[] concatFields, Object value, String separator) throws NoSuchFieldException, IllegalAccessException {
         Field field;

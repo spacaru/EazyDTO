@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TransferObject {
+public @interface MapObject {
 
     /**
      * Entity class to which this dto maps

@@ -1,20 +1,5 @@
 package com.norberth.test;
 
-public class ComplicatedEntity {
+public class ComplicatedEntity extends IdEntity {
 
-    private int id;
-
-    public ComplicatedEntity() {
-    }
-
-    public ComplicatedEntity(int id) {
-        this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        return "ComplicatedEntity{" +
-                "id=" + id +
-                '}';
-    }
 }

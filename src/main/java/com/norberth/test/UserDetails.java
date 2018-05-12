@@ -2,7 +2,7 @@ package com.norberth.test;
 
 import java.math.BigInteger;
 
-public class UserDetails {
+public class UserDetails extends IdEntity {
 
     private String name;
     private BigInteger age;

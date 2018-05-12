@@ -1,21 +1,20 @@
 package com.norberth.test;
 
-import com.norberth.annotation.MapListProperty;
-import com.norberth.annotation.TransferObject;
-import com.norberth.annotation.TransferObjectAttribute;
+import com.norberth.annotation.MapListAttribute;
+import com.norberth.annotation.MapObject;
+import com.norberth.annotation.MapObjectAttribute;
 
 import java.math.BigInteger;
 import java.util.List;
 
-@TransferObject(sourceClass = UserDetails.class)
+@MapObject(sourceClass = UserDetails.class)
 public class UserDetailsTO {
 
-    @TransferObjectAttribute(sourceField = "name")
+    @MapObjectAttribute(sourceField = "name")
     private String name;
-    @TransferObjectAttribute(sourceField = "email")
+    @MapObjectAttribute(sourceField = "email")
     private String email;
-    @MapListProperty
-    @TransferObjectAttribute(sourceField = "simpleDTO.complicatedEntity.id")
+    @MapListAttribute(sourceField = "simpleDTO.complicatedEntity.id", inheritedField = true)
     private List<BigInteger> idList;
 
     @Override
