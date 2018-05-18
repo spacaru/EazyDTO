@@ -25,15 +25,16 @@ public interface Mapper<T extends Enum> {
      * @param sourceField
      * @return - the field
      */
-    Field getField(T action, Object source, String sourceField);
+    Field getField(T action, Object source, String sourceField, boolean isInherited);
 
     /**
      * @param action
      * @param target
      * @param sourceField
+     * @param isInherited
      * @return
      */
-    Field getTargetObjectField(T action, Object target, String sourceField);
+    Field getTargetObjectField(Action action, Object target, String sourceField, boolean isInherited);
 
     Object getSource(Action action, Object source, String sourceField, boolean inheritedField);
 

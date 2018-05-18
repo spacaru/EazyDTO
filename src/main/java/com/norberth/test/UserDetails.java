@@ -11,7 +11,8 @@ public class UserDetails extends IdEntity {
     private String surname;
     private SimpleDTO simpleDTO;
 
-    public UserDetails(String name, BigInteger age, String email, String password, String surname, SimpleDTO simpleDTO) {
+    public UserDetails(int id,String name, BigInteger age, String email, String password, String surname, SimpleDTO simpleDTO) {
+        super(id);
         this.name = name;
         this.age = age;
         this.email = email;

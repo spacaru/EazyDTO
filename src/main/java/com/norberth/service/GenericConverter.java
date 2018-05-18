@@ -54,6 +54,7 @@ public class GenericConverter {
                     t = type.newInstance();
                     Annotation transferObject = c.getAnnotation(MapObject.class);
                     setFieldValues(c.getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
+                    setFieldValues(c.getSuperclass().getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
                     e.printStackTrace();
@@ -69,6 +70,9 @@ public class GenericConverter {
         }
         if (t == null && GenericConverterManager.isDebug()) {
             logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
+        }
+        if (GenericConverterManager.isDebug()) {
+            logger.log(Level.INFO, "Created object => " + t.toString());
         }
         return t;
     }
@@ -123,10 +127,10 @@ public class GenericConverter {
                 String[] concatFields = f.getAnnotation(MapObjectAttribute.class).concatFields();
                 String separator = f.getAnnotation(MapObjectAttribute.class).separator();
                 Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField);
+                Field field = objectMapper.getField(action, source, sourceField, isInherited);
                 currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
-                Object value = objectMapper.getValue(field, currentSource, false, null,isInherited);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                Object value = objectMapper.getValue(field, currentSource, false, null, isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName(),isInherited);
                 if (field != null) {
                     field.setAccessible(true);
                 }
@@ -136,9 +140,9 @@ public class GenericConverter {
                 String sourceField = f.getAnnotation(MapListAttribute.class).sourceField();
                 boolean isInherited = f.getAnnotation(MapListAttribute.class).inheritedField();
                 Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField);
-                Object value = objectMapper.getValue(field, source, true, sourceField,isInherited);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                Field field = objectMapper.getField(action, source, sourceField, isInherited);
+                Object value = objectMapper.getValue(field, source, true, sourceField, isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName(), isInherited);
                 if (field != null) {
                     field.setAccessible(true);
                 }

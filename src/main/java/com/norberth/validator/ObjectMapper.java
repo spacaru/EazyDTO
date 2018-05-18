@@ -3,6 +3,7 @@ package com.norberth.validator;
 import com.norberth.config.ConverterConfig;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,17 +23,20 @@ public class ObjectMapper implements Mapper<Action> {
     }
 
     @Override
-    public Field getField(Action action, Object source, String sourceField) {
+    public Field getField(Action action, Object source, String sourceField, boolean isInherited) {
         Field retField = null;
         try {
             switch (action) {
                 case SET_FIELDS:
-                    retField = source.getClass().getDeclaredField(sourceField);
-
+                    if (isInherited) {
+                        retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
+                    } else {
+                        retField = source.getClass().getDeclaredField(sourceField);
+                    }
                     break;
                 case RECURSIVELY_SET_FIELDS:
                     String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                    retField = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1]);
+                    retField = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], isInherited);
                     break;
             }
         } catch (NoSuchFieldException e) {
@@ -43,7 +47,7 @@ public class ObjectMapper implements Mapper<Action> {
 
 
     @Override
-    public Field getTargetObjectField(Action action, Object target, String sourceField) {
+    public Field getTargetObjectField(Action action, Object target, String sourceField, boolean isInherited) {
         Field retField = null;
         try {
             switch (action) {
@@ -51,7 +55,11 @@ public class ObjectMapper implements Mapper<Action> {
                     retField = target.getClass().getDeclaredField(sourceField);
                     break;
                 case SET_FIELDS:
-                    retField = target.getClass().getDeclaredField(sourceField);
+                    if (isInherited) {
+                        retField = target.getClass().getSuperclass().getDeclaredField(sourceField);
+                    } else {
+                        retField = target.getClass().getDeclaredField(sourceField);
+                    }
                     break;
             }
         } catch (NoSuchFieldException e) {
@@ -91,7 +99,7 @@ public class ObjectMapper implements Mapper<Action> {
         return value;
     }
 
-    private Field getFieldResursively(List<String> sourceList, Object source, String name) {
+    private Field getFieldResursively(List<String> sourceList, Object source, String name, boolean isInherited) {
         ListIterator<String> stringListIterator = sourceList.listIterator();
         Field f = null;
         try {
@@ -100,7 +108,11 @@ public class ObjectMapper implements Mapper<Action> {
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
                     if (source != null) {
-                        f = source.getClass().getDeclaredField(currentField);
+                        if (isInherited) {
+                            f = source.getClass().getSuperclass().getDeclaredField(currentField);
+                        } else {
+                            f = source.getClass().getDeclaredField(currentField);
+                        }
                         return f;
                     } else {
                         return null;
@@ -109,7 +121,7 @@ public class ObjectMapper implements Mapper<Action> {
                     Field targetField = source.getClass().getDeclaredField(currentField);
                     targetField.setAccessible(true);
                     Object newSource = targetField.get(source);
-                    f = getFieldResursively(sourceList, newSource, name);
+                    f = getFieldResursively(sourceList, newSource, name, isInherited);
                 }
 
             }
@@ -132,7 +144,7 @@ public class ObjectMapper implements Mapper<Action> {
                     return source;
                 } else {
                     Field f = null;
-                        f = source.getClass().getDeclaredField(currentField);
+                    f = source.getClass().getDeclaredField(currentField);
                     f.setAccessible(true);
                     Object newSource = f.get(source);
                     sourceObject = getSourceRecursively(strings, newSource);
@@ -168,7 +180,7 @@ public class ObjectMapper implements Mapper<Action> {
                             sourceField.setAccessible(true);
                             Object value = sourceField.get(obj);
                             Object targetObject = null;
-                            if (sourceField.getType().isPrimitive()) {
+                            if (sourceField.getType().isPrimitive() || sourceField.getType().equals(Integer.class) || sourceField.getType().equals(String.class) || sourceField.getType().equals(Long.class) || sourceField.getType().equals(Float.class) || sourceField.getType().equals(Byte.class) || sourceField.getType().equals(BigDecimal.class)) {
                                 targetObject = value;
                             } else {
                                 Object newObject = sourceField.getType().newInstance();
@@ -186,7 +198,7 @@ public class ObjectMapper implements Mapper<Action> {
                     targetField.setAccessible(true);
                     Object newSource = targetField.get(source);
                     Object retObject = null;
-                    retObject = getListValues(sourceList, newSource, name,isInherited);
+                    retObject = getListValues(sourceList, newSource, name, isInherited);
                     return retObject;
                 }
 
