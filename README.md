@@ -7,8 +7,9 @@ usage :
 
 <h2>Available annotations </h2>
 <ul>
-<li> @TransferObject - <b>sourceClass</b> - eg : Account.class</li>
-<li> @TransferObjectAttribute - <b>sourceField</b> - entity source field - eg : 'name'</li>
+<li> @MapObject - <b>sourceClass</b> - eg : Account.class</li>
+<li> @MapAttribute - <b>sourceField</b> - entity source field - eg : 'name'</li>
+        <li> @MapList - <b>sourceField</b>  - entity source field </li>
 </ul>
 
 <h2>Converter manager initialization</h2>
