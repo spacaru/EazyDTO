@@ -1,8 +1,8 @@
 package com.norberth.test;
 
-import com.norberth.annotation.MapListAttribute;
+import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
-import com.norberth.annotation.MapObjectAttribute;
+import com.norberth.annotation.MapAttribute;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -10,11 +10,11 @@ import java.util.List;
 @MapObject(sourceClass = UserDetails.class)
 public class UserDetailsTO {
 
-    @MapObjectAttribute(sourceField = "name")
+    @MapAttribute(sourceField = "name")
     private String name;
-    @MapObjectAttribute(sourceField = "email")
+    @MapAttribute(sourceField = "email")
     private String email;
-    @MapListAttribute(sourceField = "simpleDTO.complicatedEntity.id", inheritedField = true)
+    @MapList(sourceField = "simpleDTO.complicatedEntity.id", inheritedField = true)
     private List<BigInteger> idList;
 
     @Override

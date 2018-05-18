@@ -1,22 +1,23 @@
 package com.norberth.test;
 
-import com.norberth.annotation.MapListAttribute;
+import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
-import com.norberth.annotation.MapObjectAttribute;
+import com.norberth.annotation.MapAttribute;
 
 import java.util.List;
 
 @MapObject(sourceClass = Post.class)
 public class PostTO extends BaseEntityTO {
 
-
-    @MapObjectAttribute(sourceField = "title")
+    @MapAttribute(sourceField = "idd", inheritedField = false)
+    private Integer id;
+    @MapAttribute(sourceField = "title")
     private String title;
-    @MapObjectAttribute(sourceField = "description")
+    @MapAttribute(sourceField = "description")
     private String description;
-    @MapListAttribute(sourceField = "tags.name", inheritedField = false)
+    @MapList(sourceField = "tags.name", inheritedField = false)
     private List<Integer> tags;
-    @MapObjectAttribute(sourceField = "user.id", inheritedField = true)
+    @MapAttribute(sourceField = "user.id", inheritedField = true)
     private Integer userId;
     private Boolean isDonation;
     //    private ImageTO mainImage;
@@ -36,7 +37,7 @@ public class PostTO extends BaseEntityTO {
     @Override
     public String toString() {
         return "PostTO{" +
-                "id=" + super.id +
+                "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +

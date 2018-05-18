@@ -1,8 +1,8 @@
 package com.norberth.service;
 
-import com.norberth.annotation.MapListAttribute;
+import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
-import com.norberth.annotation.MapObjectAttribute;
+import com.norberth.annotation.MapAttribute;
 import com.norberth.config.ConverterConfig;
 import com.norberth.util.ObjectComparator;
 import com.norberth.validator.Action;
@@ -108,7 +108,7 @@ public class GenericConverter {
 
 
     /**
-     * Sets values for list of {@link Field} annotated with {@link MapObjectAttribute} on classes annotated with {@link MapObject}
+     * Sets values for list of {@link Field} annotated with {@link MapAttribute} on classes annotated with {@link MapObject}
      *
      * @param fields
      * @param source
@@ -121,11 +121,11 @@ public class GenericConverter {
         Object currentSource = null;
         ObjectMapper objectMapper = new ObjectMapper();
         for (Field f : fields) {
-            if (f.getAnnotation(MapObjectAttribute.class) != null) {
-                String sourceField = f.getAnnotation(MapObjectAttribute.class).sourceField();
-                boolean isInherited = f.getAnnotation(MapObjectAttribute.class).inheritedField();
-                String[] concatFields = f.getAnnotation(MapObjectAttribute.class).concatFields();
-                String separator = f.getAnnotation(MapObjectAttribute.class).separator();
+            if (f.getAnnotation(MapAttribute.class) != null) {
+                String sourceField = f.getAnnotation(MapAttribute.class).sourceField();
+                boolean isInherited = f.getAnnotation(MapAttribute.class).inheritedField();
+                String[] concatFields = f.getAnnotation(MapAttribute.class).concatFields();
+                String separator = f.getAnnotation(MapAttribute.class).separator();
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField, isInherited);
                 currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
@@ -136,9 +136,9 @@ public class GenericConverter {
                 }
                 targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
-            } else if (f.getAnnotation(MapListAttribute.class) != null) {
-                String sourceField = f.getAnnotation(MapListAttribute.class).sourceField();
-                boolean isInherited = f.getAnnotation(MapListAttribute.class).inheritedField();
+            } else if (f.getAnnotation(MapList.class) != null) {
+                String sourceField = f.getAnnotation(MapList.class).sourceField();
+                boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField, isInherited);
                 Object value = objectMapper.getValue(field, source, true, sourceField, isInherited);

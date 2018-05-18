@@ -13,6 +13,8 @@ public class Post extends BaseEntity {
 
     public static final String ALL = PREFIX + ".all";
 
+
+    private Integer idd= 10;
     @Column(name = "title")
     private String title;
     @Column(name = "description")

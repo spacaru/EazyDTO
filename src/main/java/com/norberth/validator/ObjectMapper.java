@@ -58,6 +58,7 @@ public class ObjectMapper implements Mapper<Action> {
                     if (isInherited) {
                         retField = target.getClass().getSuperclass().getDeclaredField(sourceField);
                     } else {
+                        System.out.println(target.getClass());
                         retField = target.getClass().getDeclaredField(sourceField);
                     }
                     break;
