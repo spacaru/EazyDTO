@@ -23,31 +23,36 @@ public class ObjectMapper implements Mapper<Action> {
     }
 
     @Override
-    public Field getField(Action action, Object source, String sourceField, boolean isInherited) {
+    public Action getAction(String[] fields) {
+        return Action.RECURSIVELY_SET_FIELDS;
+    }
+
+    @Override
+    public Field getField(Action action, Object source, String sourceField) {
         Field retField = null;
         try {
             switch (action) {
                 case SET_FIELDS:
-                    if (isInherited) {
-                        retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
-                    } else {
-                        retField = source.getClass().getDeclaredField(sourceField);
-                    }
+                    retField = source.getClass().getDeclaredField(sourceField);
                     break;
                 case RECURSIVELY_SET_FIELDS:
                     String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                    retField = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], isInherited);
+                    retField = getFieldResursively(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], false);
                     break;
             }
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            try {
+                retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
+            } catch (NoSuchFieldException e1) {
+                e1.printStackTrace();
+            }
         }
         return retField;
     }
 
 
     @Override
-    public Field getTargetObjectField(Action action, Object target, String sourceField, boolean isInherited) {
+    public Field getTargetObjectField(Action action, Object target, String sourceField) {
         Field retField = null;
         try {
             switch (action) {
@@ -55,16 +60,16 @@ public class ObjectMapper implements Mapper<Action> {
                     retField = target.getClass().getDeclaredField(sourceField);
                     break;
                 case SET_FIELDS:
-                    if (isInherited) {
-                        retField = target.getClass().getSuperclass().getDeclaredField(sourceField);
-                    } else {
-                        System.out.println(target.getClass());
-                        retField = target.getClass().getDeclaredField(sourceField);
-                    }
+                    retField = target.getClass().getDeclaredField(sourceField);
+
                     break;
             }
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            try {
+                retField = target.getClass().getSuperclass().getDeclaredField(sourceField);
+            } catch (NoSuchFieldException e1) {
+                e1.printStackTrace();
+            }
         }
         return retField;
     }

@@ -17,6 +17,8 @@ public interface Mapper<T extends Enum> {
      */
     public T getAction(String field);
 
+    public T getAction(String[] fields);
+
     /**
      * Return the field needed for an {@link Action} on a given {@link Object} source for a given sourceField
      *
@@ -25,16 +27,15 @@ public interface Mapper<T extends Enum> {
      * @param sourceField
      * @return - the field
      */
-    Field getField(T action, Object source, String sourceField, boolean isInherited);
+    Field getField(T action, Object source, String sourceField);
 
     /**
      * @param action
      * @param target
      * @param sourceField
-     * @param isInherited
      * @return
      */
-    Field getTargetObjectField(Action action, Object target, String sourceField, boolean isInherited);
+    Field getTargetObjectField(Action action, Object target, String sourceField);
 
     Object getSource(Action action, Object source, String sourceField, boolean inheritedField);
 

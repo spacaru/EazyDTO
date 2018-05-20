@@ -20,5 +20,7 @@ public @interface MapObject {
      */
     public Class sourceClass();
 
+    public Class customCode() default CustomMapper.class;
+
     public boolean hasIdField() default false;
 }

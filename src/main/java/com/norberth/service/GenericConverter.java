@@ -1,9 +1,8 @@
 package com.norberth.service;
 
-import com.norberth.annotation.MapList;
-import com.norberth.annotation.MapObject;
-import com.norberth.annotation.MapAttribute;
+import com.norberth.annotation.*;
 import com.norberth.config.ConverterConfig;
+import com.norberth.factory.GenericConverterFactory;
 import com.norberth.util.ObjectComparator;
 import com.norberth.validator.Action;
 import com.norberth.validator.ObjectMapper;
@@ -15,6 +14,8 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,6 +56,26 @@ public class GenericConverter {
                     Annotation transferObject = c.getAnnotation(MapObject.class);
                     setFieldValues(c.getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
                     setFieldValues(c.getSuperclass().getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
+                    Class customCodeClass = ((MapObject) transferObject).customCode();
+                    if (customCodeClass.getGenericInterfaces().length > 0) {
+                        if (customCodeClass.getGenericInterfaces()[0].getTypeName().contains(CustomMapper.class.getTypeName())) {
+                            Class[] argTypes = new Class[]{Object.class, Object.class};
+                            Method m = customCodeClass.getMethod("postProcess", argTypes);
+                            Object[] objArray = new Object[2];
+                            objArray[0] = source;
+                            objArray[1] = t;
+
+                            t = m.invoke(customCodeClass.newInstance(), objArray);
+                        } else {
+                            if (GenericConverterFactory.isDebug()) {
+                                logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
+                            }
+                        }
+                    } else {
+                        if (GenericConverterFactory.isDebug()) {
+                            logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
+                        }
+                    }
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
                     e.printStackTrace();
@@ -65,13 +86,17 @@ public class GenericConverter {
                     logger.log(Level.SEVERE, e.getMessage());
                     e.printStackTrace();
                     continue;
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
             }
         }
-        if (t == null && GenericConverterManager.isDebug()) {
+        if (t == null && GenericConverterFactory.isDebug()) {
             logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
         }
-        if (GenericConverterManager.isDebug()) {
+        if (GenericConverterFactory.isDebug()) {
             logger.log(Level.INFO, "Created object => " + t.toString());
         }
         return t;
@@ -120,17 +145,16 @@ public class GenericConverter {
 
         Object currentSource = null;
         ObjectMapper objectMapper = new ObjectMapper();
+
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
                 String sourceField = f.getAnnotation(MapAttribute.class).sourceField();
                 boolean isInherited = f.getAnnotation(MapAttribute.class).inheritedField();
-                String[] concatFields = f.getAnnotation(MapAttribute.class).concatFields();
-                String separator = f.getAnnotation(MapAttribute.class).separator();
                 Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField, isInherited);
+                Field field = objectMapper.getField(action, source, sourceField);
                 currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
                 Object value = objectMapper.getValue(field, currentSource, false, null, isInherited);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName(),isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
                 if (field != null) {
                     field.setAccessible(true);
                 }
@@ -140,14 +164,23 @@ public class GenericConverter {
                 String sourceField = f.getAnnotation(MapList.class).sourceField();
                 boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
                 Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField, isInherited);
+                Field field = objectMapper.getField(action, source, sourceField);
                 Object value = objectMapper.getValue(field, source, true, sourceField, isInherited);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName(), isInherited);
+                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
                 if (field != null) {
                     field.setAccessible(true);
                 }
                 targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
+            } else if (f.getAnnotation(ConcatAttributes.class) != null) {
+                String[] concatFields = f.getAnnotation(ConcatAttributes.class).concatFields();
+                String separator = f.getAnnotation(ConcatAttributes.class).separator();
+                Action action = objectMapper.getAction(concatFields);
+                for (String sourceField : concatFields) {
+                    Field field = objectMapper.getField(action, source, sourceField);
+                    Object value = objectMapper.getValue(field, source, false, sourceField, false);
+                    concatFieldsAndSetValue(source, target, f, sourceField, concatFields, value, separator);
+                }
             }
         }
 
@@ -190,7 +223,7 @@ public class GenericConverter {
                 value += separator + currentValue;
             }
         }
-        if (GenericConverterManager.isDebug()) {
+        if (GenericConverterFactory.isDebug()) {
             logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
         }
         targetObjectField.set(target, value);

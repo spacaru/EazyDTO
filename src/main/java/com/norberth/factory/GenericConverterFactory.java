@@ -1,23 +1,27 @@
-package com.norberth.service;
+package com.norberth.factory;
+
+import com.norberth.service.GenericConverter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
+ * Singleton provider factory class for generic converters of DTO (data transport object) classes
+ *
  * @author Novanc Norberth
  * @version 1.0.0
  */
-public class GenericConverterManager {
+public class GenericConverterFactory {
 
     private final Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
     private static List<GenericConverter> genericConverters;
-    private static GenericConverterManager instance = null;
+    private static GenericConverterFactory instance = null;
     private static String packageName = null;
 
     private static boolean debug = false;
 
-    private GenericConverterManager() {
+    private GenericConverterFactory() {
         genericConverters = new ArrayList<>();
     }
 
@@ -25,13 +29,25 @@ public class GenericConverterManager {
         packageName = pckName;
     }
 
-    public static GenericConverterManager getInstance() {
+    /**
+     * Get factory instance
+     *
+     * @return
+     */
+    public static GenericConverterFactory getInstance() {
         if (instance == null) {
-            instance = new GenericConverterManager();
+            instance = new GenericConverterFactory();
         }
         return instance;
     }
 
+    /**
+     * Get converter of DTO class
+     *
+     * @param target (Class) - target DTO class
+     * @return - {@link GenericConverter} associated with the DTO class
+     * <b>Note : if none exists a new one is created and returned </b>
+     */
     public GenericConverter getConverter(Class target) {
         if (packageName == null) {
             if (isDebug())
@@ -61,6 +77,11 @@ public class GenericConverterManager {
         return debug;
     }
 
+    /**
+     * Method to enable logging for debugging purposes
+     *
+     * @param deb (boolean)- if set to true debug is enabled
+     */
     public static void setDebug(boolean deb) {
         debug = deb;
     }
