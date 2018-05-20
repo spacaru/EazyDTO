@@ -40,5 +40,5 @@ public interface Mapper<T extends Enum> {
     Object getSource(Action action, Object source, String sourceField, boolean inheritedField);
 
 
-    Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited);
+    Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField);
 }

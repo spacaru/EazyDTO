@@ -56,25 +56,26 @@ public class GenericConverter {
                     Annotation transferObject = c.getAnnotation(MapObject.class);
                     setFieldValues(c.getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
                     setFieldValues(c.getSuperclass().getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
-                    Class customCodeClass = ((MapObject) transferObject).customCode();
+                    Class customCodeClass = ((MapObject) transferObject).customCodeClass();
                     if (customCodeClass.getGenericInterfaces().length > 0) {
                         if (customCodeClass.getGenericInterfaces()[0].getTypeName().contains(CustomMapper.class.getTypeName())) {
                             Class[] argTypes = new Class[]{Object.class, Object.class};
-                            Method m = customCodeClass.getMethod("postProcess", argTypes);
+                            Method m = customCodeClass.getMethod("postMap", argTypes);
                             Object[] objArray = new Object[2];
                             objArray[0] = source;
                             objArray[1] = t;
 
                             t = m.invoke(customCodeClass.newInstance(), objArray);
                         } else {
-                            if (GenericConverterFactory.isDebug()) {
-                                logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
-                            }
+
+                            logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
+                            logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
+
                         }
                     } else {
-                        if (GenericConverterFactory.isDebug()) {
-                            logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
-                        }
+                        logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
+                        logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
+
                     }
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
@@ -153,8 +154,8 @@ public class GenericConverter {
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField);
                 currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
-                Object value = objectMapper.getValue(field, currentSource, false, null, isInherited);
                 Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                Object value = objectMapper.getValue(field, currentSource, false, null, isInherited,targetObjectField);
                 if (field != null) {
                     field.setAccessible(true);
                 }
@@ -165,8 +166,8 @@ public class GenericConverter {
                 boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField);
-                Object value = objectMapper.getValue(field, source, true, sourceField, isInherited);
                 Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                Object value = objectMapper.getValue(field, source, true, sourceField, isInherited, targetObjectField);
                 if (field != null) {
                     field.setAccessible(true);
                 }
@@ -178,7 +179,7 @@ public class GenericConverter {
                 Action action = objectMapper.getAction(concatFields);
                 for (String sourceField : concatFields) {
                     Field field = objectMapper.getField(action, source, sourceField);
-                    Object value = objectMapper.getValue(field, source, false, sourceField, false);
+                    Object value = objectMapper.getValue(field, source, false, sourceField, false, null);
                     concatFieldsAndSetValue(source, target, f, sourceField, concatFields, value, separator);
                 }
             }

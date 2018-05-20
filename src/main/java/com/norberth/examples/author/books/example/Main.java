@@ -2,6 +2,7 @@ package com.norberth.examples.author.books.example;
 
 import com.norberth.examples.author.books.example.entity.Author;
 import com.norberth.examples.author.books.example.entity.Book;
+import com.norberth.examples.author.books.example.entity.Genre;
 import com.norberth.examples.author.books.example.to.AuthorTO;
 import com.norberth.factory.GenericConverterFactory;
 
@@ -19,13 +20,17 @@ public class Main {
         Book sleepingBeauty = new Book("Sleeping Beauty", "fantasy");
         Book whoStoleMyCookie = new Book("Who stole my cookie?", "comedy");
         Author jamesDelaney = new Author(Arrays.asList(sleepingBeauty, whoStoleMyCookie));
+        jamesDelaney.setGenre(Genre.FANTASY);
         jamesDelaney.setAge(42);
         jamesDelaney.setName("James");
+        jamesDelaney.setSurname("Delaney");
         Book firstBook = new Book("Uninspired book", "autobiography");
         Book secondBook = new Book("Nothing new", "lifestyle");
         Author joanaDelaney = new Author(Arrays.asList(firstBook, secondBook));
         joanaDelaney.setAge(27);
+        joanaDelaney.setGenre(Genre.ROMANCE);
         joanaDelaney.setName("Joana");
+        joanaDelaney.setSurname("Delaney");
 
 
 //        now lets say we want to display the names of books for this author in a web page and we only need the book name

@@ -3,12 +3,12 @@ package com.norberth.examples.author.books.example.to;
 import com.norberth.annotation.MapAttribute;
 import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
-import com.norberth.examples.author.books.example.entity.Author;
 import com.norberth.examples.author.books.example.custom.code.CustomCode;
+import com.norberth.examples.author.books.example.entity.Author;
 
 import java.util.List;
 
-@MapObject(sourceClass = Author.class,customCode = CustomCode.class)
+@MapObject(sourceClass = Author.class, customCodeClass = CustomCode.class)
 public class AuthorTO {
     //    maps name field from each published book of the author to this list of strings
     @MapList(sourceField = "publishedBooks.name")
@@ -17,8 +17,30 @@ public class AuthorTO {
     //    we can map inherited fields
     @MapAttribute(sourceField = "name")
     private String name;
+    //    we can map primitives
     @MapAttribute(sourceField = "age")
     private int age;
+    //    we can map Object fields
+    @MapAttribute(sourceField = "genre")
+    private String genre;
+    //    we set this field using CustomeCode class by implementing CustomMapper<Author,AuthorTO> interface then in postMap method we set the fullName
+    private String fullName;
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
     public List<String> getBookNames() {
         return bookNames;
@@ -50,6 +72,8 @@ public class AuthorTO {
                 "bookNames=" + bookNames +
                 ", name='" + name + '\'' +
                 ", age=" + age +
+                ", genre='" + genre + '\'' +
+                ", fullName='" + fullName + '\'' +
                 '}';
     }
 }

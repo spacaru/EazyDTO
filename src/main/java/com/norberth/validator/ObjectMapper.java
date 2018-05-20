@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Logger;
 
 public class ObjectMapper implements Mapper<Action> {
+
+    private static final Logger logger = Logger.getLogger(ObjectMapper.class.getSimpleName());
 
     @Override
     public Action getAction(String field) {
@@ -90,11 +93,11 @@ public class ObjectMapper implements Mapper<Action> {
     }
 
     @Override
-    public Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited) {
+    public Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField) {
         Object value = null;
         try {
             if (!isListField) {
-                value = getFieldValue(field, source);
+                value = getFieldValue(field, source, targetObjectField);
             } else {
                 String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
                 value = getListValues(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], isInherited);
@@ -220,10 +223,21 @@ public class ObjectMapper implements Mapper<Action> {
         return f;
     }
 
-    private Object getFieldValue(Field field, Object source) throws IllegalAccessException {
+    private Object getFieldValue(Field field, Object source, Field targetObjectField) throws IllegalAccessException {
         Object value = null;
         field.setAccessible(true);
-        value = field.get(source);
+        if (field.getType().isEnum()) {
+            if (targetObjectField.getType().isEnum()) {
+                value = field.get(source);
+            } else if (targetObjectField.getType().isAssignableFrom(String.class)) {
+                value = field.get(source).toString();
+            }
+        } else {
+            value = field.get(source);
+        }
+        if (value == null) {
+            logger.severe("Could not map field '" + targetObjectField.getName() + "' of type :" + targetObjectField.getType() + " from field : '" + field.getName() + "' of type :" + field.getType());
+        }
         return value;
     }
 }

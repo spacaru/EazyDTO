@@ -5,8 +5,17 @@ import java.util.List;
 public class Author extends Person {
 
     private List<Book> publishedBooks;
+    private Genre genre;
 
     public Author() {
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
     }
 
     public Author(List<Book> publishedBooks) {
@@ -25,6 +34,7 @@ public class Author extends Person {
     public String toString() {
         return "Author{" +
                 "publishedBooks=" + publishedBooks +
+                ", genre=" + genre +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", rentedBooks=" + rentedBooks +
