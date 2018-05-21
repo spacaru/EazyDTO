@@ -3,6 +3,7 @@ package com.norberth.examples.author.books.example;
 import com.norberth.examples.author.books.example.entity.Author;
 import com.norberth.examples.author.books.example.entity.Book;
 import com.norberth.examples.author.books.example.entity.Genre;
+import com.norberth.examples.author.books.example.entity.Publisher;
 import com.norberth.examples.author.books.example.to.AuthorTO;
 import com.norberth.factory.GenericConverterFactory;
 
@@ -14,13 +15,14 @@ public class Main {
     public static void main(String[] args) {
         GenericConverterFactory gcm = GenericConverterFactory.getInstance();
         gcm.setDebug(true);
-        gcm.setPackageName("com.norberth.examples");
+        gcm.setPackageName("com.norberth.examples.author.books.example.to");
 
 //        lets create some Authors with some books
         Book sleepingBeauty = new Book("Sleeping Beauty", "fantasy");
         Book whoStoleMyCookie = new Book("Who stole my cookie?", "comedy");
         Author jamesDelaney = new Author(Arrays.asList(sleepingBeauty, whoStoleMyCookie));
         jamesDelaney.setGenre(Genre.FANTASY);
+        jamesDelaney.setPublisher(new Publisher("RoPublish"));
         jamesDelaney.setAge(42);
         jamesDelaney.setName("James");
         jamesDelaney.setSurname("Delaney");

@@ -14,7 +14,7 @@ public @interface MapList {
      *
      * @return
      */
-    public String sourceField();
+    public String value();
 
     /**
      * Set this flag to true when mappedField is inherited from superclass

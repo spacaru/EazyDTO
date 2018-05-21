@@ -18,13 +18,6 @@ public @interface MapAttribute {
      *
      * @return
      */
-    public String sourceField();
+    public String value();
 
-
-    /**
-     * Set this flag to true when mappedField is inherited from superclass
-     *
-     * @return
-     */
-    public boolean inheritedField() default false;
 }

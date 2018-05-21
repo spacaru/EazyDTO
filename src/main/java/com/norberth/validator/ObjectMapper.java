@@ -46,6 +46,7 @@ public class ObjectMapper implements Mapper<Action> {
         } catch (NoSuchFieldException e) {
             try {
                 retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
+                return retField;
             } catch (NoSuchFieldException e1) {
                 e1.printStackTrace();
             }
@@ -111,17 +112,16 @@ public class ObjectMapper implements Mapper<Action> {
     private Field getFieldResursively(List<String> sourceList, Object source, String name, boolean isInherited) {
         ListIterator<String> stringListIterator = sourceList.listIterator();
         Field f = null;
+        String currField = "";
         try {
             while (stringListIterator.hasNext()) {
+
                 String currentField = stringListIterator.next();
+                currField = currentField;
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
                     if (source != null) {
-                        if (isInherited) {
-                            f = source.getClass().getSuperclass().getDeclaredField(currentField);
-                        } else {
-                            f = source.getClass().getDeclaredField(currentField);
-                        }
+                        f = source.getClass().getDeclaredField(currentField);
                         return f;
                     } else {
                         return null;
@@ -135,7 +135,12 @@ public class ObjectMapper implements Mapper<Action> {
 
             }
         } catch (NoSuchFieldException e) {
-            return f;
+            try {
+                f = source.getClass().getSuperclass().getDeclaredField(currField);
+                return f;
+            } catch (NoSuchFieldException e1) {
+                return f;
+            }
         } catch (IllegalAccessException e) {
             return f;
         }
@@ -225,6 +230,10 @@ public class ObjectMapper implements Mapper<Action> {
 
     private Object getFieldValue(Field field, Object source, Field targetObjectField) throws IllegalAccessException {
         Object value = null;
+        if (field == null) {
+            logger.severe("Could not find associated field for " + targetObjectField.getName() + " field from source object " + source);
+            return null;
+        }
         field.setAccessible(true);
         if (field.getType().isEnum()) {
             if (targetObjectField.getType().isEnum()) {

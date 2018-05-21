@@ -20,7 +20,7 @@ public interface Mapper<T extends Enum> {
     public T getAction(String[] fields);
 
     /**
-     * Return the field needed for an {@link Action} on a given {@link Object} source for a given sourceField
+     * Return the field needed for an {@link Action} on a given {@link Object} source for a given value
      *
      * @param action
      * @param source

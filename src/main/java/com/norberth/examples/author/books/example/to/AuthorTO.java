@@ -11,20 +11,22 @@ import java.util.List;
 @MapObject(sourceClass = Author.class, customCodeClass = CustomCode.class)
 public class AuthorTO {
     //    maps name field from each published book of the author to this list of strings
-    @MapList(sourceField = "publishedBooks.name")
+    @MapList(value = "publishedBooks.name")
     private List<String> bookNames;
 
     //    we can map inherited fields
-    @MapAttribute(sourceField = "name")
+    @MapAttribute("name")
     private String name;
     //    we can map primitives
-    @MapAttribute(sourceField = "age")
+    @MapAttribute("age")
     private int age;
     //    we can map Object fields
-    @MapAttribute(sourceField = "genre")
+    @MapAttribute("genre")
     private String genre;
     //    we set this field using CustomeCode class by implementing CustomMapper<Author,AuthorTO> interface then in postMap method we set the fullName
     private String fullName;
+    @MapAttribute("publisher.name")
+    private String publisherName;
 
     public String getGenre() {
         return genre;
@@ -74,6 +76,7 @@ public class AuthorTO {
                 ", age=" + age +
                 ", genre='" + genre + '\'' +
                 ", fullName='" + fullName + '\'' +
+                ", publisherName='" + publisherName + '\'' +
                 '}';
     }
 }

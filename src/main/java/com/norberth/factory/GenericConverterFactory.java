@@ -1,5 +1,6 @@
 package com.norberth.factory;
 
+import com.norberth.exception.NoPackage;
 import com.norberth.service.GenericConverter;
 
 import java.util.ArrayList;
@@ -51,7 +52,11 @@ public class GenericConverterFactory {
     public GenericConverter getConverter(Class target) {
         if (packageName == null) {
             if (isDebug())
-                logger.warning("Package not set. Set a package to scan for. Package example : com.norberth.test.package");
+                try {
+                    throw new NoPackage("Package not set. Set a package to scan for. Package example : com.norberth.examples");
+                } catch (NoPackage noPackage) {
+                    logger.severe(noPackage.getMessage());
+                }
             return null;
         }
 

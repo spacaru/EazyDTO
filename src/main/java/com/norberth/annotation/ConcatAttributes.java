@@ -3,7 +3,7 @@ package com.norberth.annotation;
 public @interface ConcatAttributes {
 
     /**
-     * List of additional fields to be concatenated to sourceField
+     * List of additional fields to be concatenated to value
      * Source field must be of type String , otherwise concatenation is not possible
      *
      * @return

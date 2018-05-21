@@ -72,10 +72,6 @@ public class GenericConverter {
                             logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
 
                         }
-                    } else {
-                        logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
-                        logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
-
                     }
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, e.getMessage());
@@ -149,20 +145,19 @@ public class GenericConverter {
 
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
-                String sourceField = f.getAnnotation(MapAttribute.class).sourceField();
-                boolean isInherited = f.getAnnotation(MapAttribute.class).inheritedField();
+                String sourceField = f.getAnnotation(MapAttribute.class).value();
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField);
-                currentSource = objectMapper.getSource(action, source, sourceField, isInherited);
+                currentSource = objectMapper.getSource(action, source, sourceField, false);
                 Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
-                Object value = objectMapper.getValue(field, currentSource, false, null, isInherited,targetObjectField);
+                Object value = objectMapper.getValue(field, currentSource, false, null, false, targetObjectField);
                 if (field != null) {
                     field.setAccessible(true);
                 }
                 targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
             } else if (f.getAnnotation(MapList.class) != null) {
-                String sourceField = f.getAnnotation(MapList.class).sourceField();
+                String sourceField = f.getAnnotation(MapList.class).value();
                 boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
                 Action action = objectMapper.getAction(sourceField);
                 Field field = objectMapper.getField(action, source, sourceField);
