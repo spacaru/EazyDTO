@@ -5,14 +5,15 @@ import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
 import com.norberth.examples.author.books.example.custom.code.CustomCode;
 import com.norberth.examples.author.books.example.entity.Author;
+import com.norberth.examples.author.books.example.entity.Book;
 
 import java.util.List;
 
-@MapObject(sourceClass = Author.class, customCodeClass = CustomCode.class)
+@MapObject(fromClass = Author.class, customMapperClass = CustomCode.class)
 public class AuthorTO {
     //    maps name field from each published book of the author to this list of strings
-    @MapList(value = "publishedBooks.name")
-    private List<String> bookNames;
+    @MapObject(value="publishedBooks",fromClass = Book.class)
+    private List<BookTO> books;
 
     //    we can map inherited fields
     @MapAttribute("name")
@@ -23,7 +24,7 @@ public class AuthorTO {
     //    we can map Object fields
     @MapAttribute("genre")
     private String genre;
-    //    we set this field using CustomeCode class by implementing CustomMapper<Author,AuthorTO> interface then in postMap method we set the fullName
+    //    we set this field using CustomeCode class by implementing CustomEvent<Author,AuthorTO> interface then in postMap method we set the fullName
     private String fullName;
     @MapAttribute("publisher.name")
     private String publisherName;
@@ -44,12 +45,20 @@ public class AuthorTO {
         this.fullName = fullName;
     }
 
-    public List<String> getBookNames() {
-        return bookNames;
+    public String getPublisherName() {
+        return publisherName;
     }
 
-    public void setBookNames(List<String> bookNames) {
-        this.bookNames = bookNames;
+    public void setPublisherName(String publisherName) {
+        this.publisherName = publisherName;
+    }
+
+    public List<BookTO> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<BookTO> books) {
+        this.books = books;
     }
 
     public String getName() {
@@ -71,7 +80,7 @@ public class AuthorTO {
     @Override
     public String toString() {
         return "AuthorTO{" +
-                "bookNames=" + bookNames +
+                "books=" + books +
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 ", genre='" + genre + '\'' +

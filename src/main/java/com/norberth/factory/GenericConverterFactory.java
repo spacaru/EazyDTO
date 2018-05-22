@@ -1,6 +1,7 @@
 package com.norberth.factory;
 
 import com.norberth.exception.NoPackage;
+import com.norberth.service.Converter;
 import com.norberth.service.GenericConverter;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class GenericConverterFactory {
             for (GenericConverter genericConverter : genericConverters) {
                 if (genericConverter.equals(new GenericConverter(target, packageName))) {
                     if (isDebug())
-                        logger.info(" Found converter for " + target.getSimpleName() + " class " + genericConverter.getType());
+                        logger.info(" Found converter for " + target.getSimpleName() + " class " + genericConverter.getClass().getTypeName());
                     return genericConverter;
                 }
             }

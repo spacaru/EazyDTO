@@ -1,7 +1,10 @@
 package com.norberth.service;
 
-import com.norberth.annotation.*;
+import com.norberth.annotation.MapAttribute;
+import com.norberth.annotation.MapList;
+import com.norberth.annotation.MapObject;
 import com.norberth.config.ConverterConfig;
+import com.norberth.event.CustomEvent;
 import com.norberth.factory.GenericConverterFactory;
 import com.norberth.util.ObjectComparator;
 import com.norberth.validator.Action;
@@ -16,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +28,7 @@ import java.util.logging.Logger;
  * @author Novanc Norberth
  * @version 1.0.0
  */
-public class GenericConverter {
+public class GenericConverter implements Converter {
 
     private Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
     private final Class type;
@@ -40,8 +44,9 @@ public class GenericConverter {
      * Returns transfer object from source object
      *
      * @param source
-     * @return - newly created transfer object
+     * @return newly created transfer object
      */
+    @Override
     public Object getTo(Object source) {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage(this.packageName))
@@ -54,11 +59,11 @@ public class GenericConverter {
                 try {
                     t = type.newInstance();
                     Annotation transferObject = c.getAnnotation(MapObject.class);
-                    setFieldValues(c.getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
-                    setFieldValues(c.getSuperclass().getDeclaredFields(), source, t, ((MapObject) transferObject).hasIdField());
-                    Class customCodeClass = ((MapObject) transferObject).customCodeClass();
+                    setFieldValues(c.getDeclaredFields(), source, t);
+                    setFieldValues(c.getSuperclass().getDeclaredFields(), source, t);
+                    Class customCodeClass = ((MapObject) transferObject).customMapperClass();
                     if (customCodeClass.getGenericInterfaces().length > 0) {
-                        if (customCodeClass.getGenericInterfaces()[0].getTypeName().contains(CustomMapper.class.getTypeName())) {
+                        if (customCodeClass.getGenericInterfaces()[0].getTypeName().contains(CustomEvent.class.getTypeName())) {
                             Class[] argTypes = new Class[]{Object.class, Object.class};
                             Method m = customCodeClass.getMethod("postMap", argTypes);
                             Object[] objArray = new Object[2];
@@ -68,7 +73,7 @@ public class GenericConverter {
                             t = m.invoke(customCodeClass.newInstance(), objArray);
                         } else {
 
-                            logger.severe("Annotated class must implement CustomMapper<Source S,Target T> interface!");
+                            logger.severe("Annotated class must implement CustomEvent<Source S,Target T> interface!");
                             logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
 
                         }
@@ -103,6 +108,7 @@ public class GenericConverter {
      * @param sourceList
      * @return
      */
+    @Override
     public List<Object> getToList(List sourceList) {
         List<Object> retList = new ArrayList<>();
         for (Object sourceObj : sourceList) {
@@ -118,6 +124,7 @@ public class GenericConverter {
      * @param attribute
      * @return
      */
+    @Override
     public List<Object> getToListSortBy(List sourceList, String attribute) {
         List<Object> retList = new ArrayList<>();
         for (Object sourceObj : sourceList) {
@@ -138,11 +145,11 @@ public class GenericConverter {
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private void setFieldValues(Field[] fields, Object source, Object target, boolean hasId) throws NoSuchFieldException, IllegalAccessException {
+    private Object setFieldValues(Field[] fields, Object source, Object target) throws NoSuchFieldException, IllegalAccessException {
 
         Object currentSource = null;
         ObjectMapper objectMapper = new ObjectMapper();
-
+        Object oldTarget = target;
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
                 String sourceField = f.getAnnotation(MapAttribute.class).value();
@@ -168,18 +175,37 @@ public class GenericConverter {
                 }
                 targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
-            } else if (f.getAnnotation(ConcatAttributes.class) != null) {
-                String[] concatFields = f.getAnnotation(ConcatAttributes.class).concatFields();
-                String separator = f.getAnnotation(ConcatAttributes.class).separator();
-                Action action = objectMapper.getAction(concatFields);
-                for (String sourceField : concatFields) {
-                    Field field = objectMapper.getField(action, source, sourceField);
-                    Object value = objectMapper.getValue(field, source, false, sourceField, false, null);
-                    concatFieldsAndSetValue(source, target, f, sourceField, concatFields, value, separator);
+            } else if (f.getAnnotation(MapObject.class) != null) {
+                Annotation mapObject = f.getAnnotation(MapObject.class);
+                Class c = ((MapObject) mapObject).fromClass();
+                String sourceField = ((MapObject) mapObject).value();
+                try {
+                    if (f.getType().equals(List.class)) {
+//                        target = new ArrayList<>();
+                        ParameterizedType integerListType = (ParameterizedType) f.getGenericType();
+                        Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
+                        Field targetFieldInEntity = source.getClass().getDeclaredField(sourceField);
+                        targetFieldInEntity.setAccessible(true);
+                        List sourceList = (List) targetFieldInEntity.get(source);
+                        target = new ArrayList();
+                        for (Object element : sourceList) {
+                            Object targetObjectInList = integerListClass.newInstance();
+                            Object newElement = setFieldValues(integerListClass.getDeclaredFields(), element, targetObjectInList);
+                            ((ArrayList) target).add(newElement);
+                        }
+                        Field toField = oldTarget.getClass().getDeclaredField(f.getName());
+                        toField.setAccessible(true);
+                        toField.set(oldTarget, target);
+
+                    }
+                    target = oldTarget;
+
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
                 }
             }
         }
-
+        return target;
     }
 
 

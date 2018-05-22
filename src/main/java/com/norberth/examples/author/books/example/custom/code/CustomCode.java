@@ -1,13 +1,13 @@
 package com.norberth.examples.author.books.example.custom.code;
 
-import com.norberth.annotation.CustomMapper;
+import com.norberth.event.CustomEvent;
 import com.norberth.examples.author.books.example.entity.Author;
 import com.norberth.examples.author.books.example.to.AuthorTO;
 
 /**
  * Powerful way to customize fields that need to be transformed in any way
  */
-public class CustomCode implements CustomMapper<Author, AuthorTO> {
+public class CustomCode implements CustomEvent<Author, AuthorTO> {
     //    @Override
     public AuthorTO postMap(Author sourceEntity, AuthorTO transferObject) {
 //      lets say we have to capitalize all author names

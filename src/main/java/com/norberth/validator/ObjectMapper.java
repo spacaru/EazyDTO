@@ -36,6 +36,9 @@ public class ObjectMapper implements Mapper<Action> {
         try {
             switch (action) {
                 case SET_FIELDS:
+                    if(source.getClass().isAssignableFrom(List.class)){
+                        System.out.println("bingo");
+                    }
                     retField = source.getClass().getDeclaredField(sourceField);
                     break;
                 case RECURSIVELY_SET_FIELDS:
