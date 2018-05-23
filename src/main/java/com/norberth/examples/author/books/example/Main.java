@@ -21,6 +21,7 @@ public class Main {
         Book sleepingBeauty = new Book("Sleeping Beauty", "fantasy");
         Book whoStoleMyCookie = new Book("Who stole my cookie?", "comedy");
         Author jamesDelaney = new Author(Arrays.asList(sleepingBeauty, whoStoleMyCookie));
+        jamesDelaney.setPublisher(new Publisher("sc buda srl"));
         jamesDelaney.setGenre(Genre.FANTASY);
         jamesDelaney.setPublisher(new Publisher("RoPublish"));
         jamesDelaney.setAge(42);

@@ -1,24 +1,24 @@
 package com.norberth.examples.author.books.example.entity;
 
 public class Publisher {
-    private String name;
+    private String companyName;
 
     public Publisher(String name) {
-        this.name = name;
+        this.companyName = name;
     }
 
     @Override
     public String toString() {
         return "Publisher{" +
-                "publisherName='" + name + '\'' +
+                "publisherName='" + companyName + '\'' +
                 '}';
     }
 
-    public String getName() {
-        return name;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setName(String publisherName) {
-        this.name = publisherName;
+    public void setCompanyName(String publisherName) {
+        this.companyName = publisherName;
     }
 }

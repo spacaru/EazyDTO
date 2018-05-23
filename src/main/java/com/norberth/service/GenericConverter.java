@@ -180,6 +180,7 @@ public class GenericConverter implements Converter {
                 Class c = ((MapObject) mapObject).fromClass();
                 String sourceField = ((MapObject) mapObject).value();
                 try {
+                    Field toField = oldTarget.getClass().getDeclaredField(f.getName());
                     if (f.getType().equals(List.class)) {
 //                        target = new ArrayList<>();
                         ParameterizedType integerListType = (ParameterizedType) f.getGenericType();
@@ -193,11 +194,21 @@ public class GenericConverter implements Converter {
                             Object newElement = setFieldValues(integerListClass.getDeclaredFields(), element, targetObjectInList);
                             ((ArrayList) target).add(newElement);
                         }
-                        Field toField = oldTarget.getClass().getDeclaredField(f.getName());
                         toField.setAccessible(true);
                         toField.set(oldTarget, target);
+                    } else {
 
+                        Field targetFieldInEntity = source.getClass().getDeclaredField(sourceField);
+                        targetFieldInEntity.setAccessible(true);
+                        source = targetFieldInEntity.get(source);
+                        if (source != null) {
+                            Object targetObjectInList = f.getType().newInstance();
+                            Object newElement = setFieldValues(targetObjectInList.getClass().getDeclaredFields(), source, targetObjectInList);
+                            toField.setAccessible(true);
+                            toField.set(target, newElement);
+                        }
                     }
+
                     target = oldTarget;
 
                 } catch (InstantiationException e) {

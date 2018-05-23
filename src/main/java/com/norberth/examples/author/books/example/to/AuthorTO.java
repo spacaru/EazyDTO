@@ -6,6 +6,7 @@ import com.norberth.annotation.MapObject;
 import com.norberth.examples.author.books.example.custom.code.CustomCode;
 import com.norberth.examples.author.books.example.entity.Author;
 import com.norberth.examples.author.books.example.entity.Book;
+import com.norberth.examples.author.books.example.entity.Publisher;
 
 import java.util.List;
 
@@ -26,8 +27,16 @@ public class AuthorTO {
     private String genre;
     //    we set this field using CustomeCode class by implementing CustomEvent<Author,AuthorTO> interface then in postMap method we set the fullName
     private String fullName;
-    @MapAttribute("publisher.name")
-    private String publisherName;
+   @MapObject(value="publisher",fromClass = Publisher.class)
+   private PublisherTO publisherTO;
+
+    public PublisherTO getPublisherTO() {
+        return publisherTO;
+    }
+
+    public void setPublisherTO(PublisherTO publisherTO) {
+        this.publisherTO = publisherTO;
+    }
 
     public String getGenre() {
         return genre;
@@ -45,13 +54,6 @@ public class AuthorTO {
         this.fullName = fullName;
     }
 
-    public String getPublisherName() {
-        return publisherName;
-    }
-
-    public void setPublisherName(String publisherName) {
-        this.publisherName = publisherName;
-    }
 
     public List<BookTO> getBooks() {
         return books;
@@ -85,7 +87,7 @@ public class AuthorTO {
                 ", age=" + age +
                 ", genre='" + genre + '\'' +
                 ", fullName='" + fullName + '\'' +
-                ", publisherName='" + publisherName + '\'' +
+                ", publisherTO=" + publisherTO +
                 '}';
     }
 }
