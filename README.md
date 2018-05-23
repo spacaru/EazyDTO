@@ -7,7 +7,8 @@ usage :
 
 <h2>Available annotations </h2>
 <ul>
-<li> @MapObject - <b>value</b> - eg : Account.class</li>
+<li> @MapObject - <b>fromClass</b> - eg : Account.class
+  <br/>            - <b>value</b> - eg : 'account' </li>
 <li> @MapAttribute - <b>value</b> - entity source field - eg : 'name'</li>
         <li> @MapList - <b>value</b>  - entity source field </li>
 </ul>
