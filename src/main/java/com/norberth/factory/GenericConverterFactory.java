@@ -1,7 +1,6 @@
 package com.norberth.factory;
 
 import com.norberth.exception.NoPackage;
-import com.norberth.service.Converter;
 import com.norberth.service.GenericConverter;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class GenericConverterFactory {
     private static List<GenericConverter> genericConverters;
     private static GenericConverterFactory instance = null;
     private static String packageName = null;
-
+    private static boolean scanTestPackage;
     private static boolean debug = false;
 
     private GenericConverterFactory() {
@@ -51,7 +50,7 @@ public class GenericConverterFactory {
      * <b>Note : if none exists a new one is created and returned </b>
      */
     public GenericConverter getConverter(Class target) {
-        if (packageName == null) {
+        if (packageName == null && !isScanTestPackage()) {
             if (isDebug())
                 try {
                     throw new NoPackage("Package not set. Set a package to scan for. Package example : com.norberth.examples");
@@ -61,8 +60,14 @@ public class GenericConverterFactory {
             return null;
         }
 
+
         if (!genericConverters.contains(new GenericConverter(target, packageName))) {
-            GenericConverter converter = new GenericConverter(target, packageName);
+            GenericConverter converter = null;
+            if (isScanTestPackage()) {
+                converter = new GenericConverter(target, true);
+            } else {
+                converter = new GenericConverter(target, packageName);
+            }
             genericConverters.add(converter);
             if (isDebug())
                 logger.info(" Created new converter for class " + target.getSimpleName());
@@ -90,5 +95,13 @@ public class GenericConverterFactory {
      */
     public static void setDebug(boolean deb) {
         debug = deb;
+    }
+
+    public static boolean isScanTestPackage() {
+        return scanTestPackage;
+    }
+
+    public static void setScanTestPackage(boolean scanTestPackage) {
+        GenericConverterFactory.scanTestPackage = scanTestPackage;
     }
 }

@@ -8,6 +8,12 @@ import com.norberth.examples.author.books.example.entity.Book;
 public class BookTO {
     @MapAttribute("name")
     private String name;
+    @MapAttribute("id")
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -21,6 +27,7 @@ public class BookTO {
     public String toString() {
         return "BookTO{" +
                 "name='" + name + '\'' +
+                ", id=" + id +
                 '}';
     }
 }

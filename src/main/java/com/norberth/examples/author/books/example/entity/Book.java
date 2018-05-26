@@ -1,14 +1,16 @@
 package com.norberth.examples.author.books.example.entity;
 
-public class Book {
+public class Book extends BaseEntity {
 
     private String name;
     private String genre;
 
     public Book() {
+        super();
     }
 
-    public Book(String name, String genre) {
+    public Book(Integer id,String name, String genre) {
+        super(id);
         this.name = name;
         this.genre = genre;
     }

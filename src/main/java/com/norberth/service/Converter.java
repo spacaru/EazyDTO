@@ -1,5 +1,7 @@
 package com.norberth.service;
 
+import com.norberth.util.SortationType;
+
 import java.util.List;
 
 public interface Converter {
@@ -27,4 +29,14 @@ public interface Converter {
      * @return
      */
     List<Object> getToListSortBy(List sourceList, String attribute);
+
+    /**
+     * Returns the sorted TO list from the input sourceList with the given sortation type ( DEFAULT : ASCENDING )
+     *
+     * @param sourceList
+     * @param attribute
+     * @param sortationType
+     * @return
+     */
+    List<Object> getToListSortBy(List sourceList, String attribute, SortationType sortationType);
 }

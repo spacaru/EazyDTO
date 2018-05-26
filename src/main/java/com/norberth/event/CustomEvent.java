@@ -9,7 +9,7 @@ package com.norberth.event;
 public interface CustomEvent<S, T> {
 
     /**
-     * Custom implementation happens inside this method
+     * Custom implementation should be in this method
      *
      * @param sourceEntity   source entity that is mapped
      * @param transferObject target transfer object entity that is mapping the sourceEntity

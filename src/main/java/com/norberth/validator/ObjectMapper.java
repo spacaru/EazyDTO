@@ -36,7 +36,7 @@ public class ObjectMapper implements Mapper<Action> {
         try {
             switch (action) {
                 case SET_FIELDS:
-                    if(source.getClass().isAssignableFrom(List.class)){
+                    if (source.getClass().isAssignableFrom(List.class)) {
                         System.out.println("bingo");
                     }
                     retField = source.getClass().getDeclaredField(sourceField);
@@ -248,7 +248,7 @@ public class ObjectMapper implements Mapper<Action> {
             value = field.get(source);
         }
         if (value == null) {
-            logger.severe("Could not map field '" + targetObjectField.getName() + "' of type :" + targetObjectField.getType() + " from field : '" + field.getName() + "' of type :" + field.getType());
+            logger.severe("Source entity " + source.getClass().getTypeName() + " has null value on field : '" + field.getName() + '\'' + " therefore we ignore @MapAttribute annotation on field '" + targetObjectField.getName() + "\'");
         }
         return value;
     }

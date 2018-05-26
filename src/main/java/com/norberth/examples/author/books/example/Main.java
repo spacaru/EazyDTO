@@ -6,6 +6,7 @@ import com.norberth.examples.author.books.example.entity.Genre;
 import com.norberth.examples.author.books.example.entity.Publisher;
 import com.norberth.examples.author.books.example.to.AuthorTO;
 import com.norberth.factory.GenericConverterFactory;
+import com.norberth.util.SortationType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +19,8 @@ public class Main {
         gcm.setPackageName("com.norberth.examples.author.books.example.to");
 
 //        lets create some Authors with some books
-        Book sleepingBeauty = new Book("Sleeping Beauty", "fantasy");
-        Book whoStoleMyCookie = new Book("Who stole my cookie?", "comedy");
+        Book sleepingBeauty = new Book(1, "Sleeping Beauty", "fantasy");
+        Book whoStoleMyCookie = new Book(2, "Who stole my cookie?", "comedy");
         Author jamesDelaney = new Author(Arrays.asList(sleepingBeauty, whoStoleMyCookie));
         jamesDelaney.setPublisher(new Publisher("sc buda srl"));
         jamesDelaney.setGenre(Genre.FANTASY);
@@ -27,8 +28,8 @@ public class Main {
         jamesDelaney.setAge(42);
         jamesDelaney.setName("James");
         jamesDelaney.setSurname("Delaney");
-        Book firstBook = new Book("Uninspired book", "autobiography");
-        Book secondBook = new Book("Nothing new", "lifestyle");
+        Book firstBook = new Book(3, "Uninspired book", "autobiography");
+        Book secondBook = new Book(4, "Nothing new", "lifestyle");
         Author joanaDelaney = new Author(Arrays.asList(firstBook, secondBook));
         joanaDelaney.setAge(27);
         joanaDelaney.setGenre(Genre.ROMANCE);
@@ -42,6 +43,7 @@ public class Main {
 //        now using the generic converter manager we can conver jamesDelaney entity to TO using getTo method
         AuthorTO authorTO = (AuthorTO) gcm.getConverter(AuthorTO.class).getTo(jamesDelaney);
 //        using the get getToList we can map list of authors to list of AuthorTOs
-        List<AuthorTO> authorTOList = (List) gcm.getConverter(AuthorTO.class).getToList(Arrays.asList(jamesDelaney, joanaDelaney));
+        List<AuthorTO> authorTOList = (List) gcm.getConverter(AuthorTO.class).getToListSortBy(Arrays.asList(jamesDelaney, joanaDelaney), "age", SortationType.DESCENDING);
+        System.out.println(authorTOList);
     }
 }

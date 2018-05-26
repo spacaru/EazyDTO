@@ -7,6 +7,7 @@ import com.norberth.config.ConverterConfig;
 import com.norberth.event.CustomEvent;
 import com.norberth.factory.GenericConverterFactory;
 import com.norberth.util.ObjectComparator;
+import com.norberth.util.SortationType;
 import com.norberth.validator.Action;
 import com.norberth.validator.ObjectMapper;
 import org.reflections.Reflections;
@@ -20,6 +21,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,11 +38,17 @@ public class GenericConverter implements Converter {
     private Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
     private final Class type;
     private String packageName;
+    private boolean isTestPackage;
     private boolean error = false;
 
     public GenericConverter(Class type, String packageName) {
         this.type = type;
         this.packageName = packageName;
+    }
+
+    public GenericConverter(Class type, boolean isTestPackage) {
+        this.isTestPackage = isTestPackage;
+        this.type = type;
     }
 
     /**
@@ -48,8 +59,23 @@ public class GenericConverter implements Converter {
      */
     @Override
     public Object getTo(Object source) {
+        URL testClassesURL = null;
+        try {
+            testClassesURL = Paths.get("target/test-classes").toUri().toURL();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{testClassesURL},
+                ClasspathHelper.staticClassLoader());
+        Collection<URL> urls = null;
+        if (packageName != null) {
+            urls = ClasspathHelper.forPackage(this.packageName);
+        } else {
+            urls = ClasspathHelper.forClassLoader((ClassLoader) classLoader);
+        }
         Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forPackage(this.packageName))
+                .setUrls(urls)
                 .setScanners(new SubTypesScanner(),
                         new TypeAnnotationsScanner()));
         Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(MapObject.class);
@@ -99,7 +125,7 @@ public class GenericConverter implements Converter {
             logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
         }
         if (GenericConverterFactory.isDebug()) {
-            logger.log(Level.INFO, "Created object => " + t.toString());
+            logger.log(Level.INFO, "Created object => " + t);
         }
         return t;
     }
@@ -118,6 +144,11 @@ public class GenericConverter implements Converter {
         return retList;
     }
 
+    @Override
+    public List<Object> getToListSortBy(List sourceList, String attribute) {
+        return getToListSortBy(sourceList, attribute, null);
+    }
+
 
     /**
      * @param sourceList
@@ -125,13 +156,16 @@ public class GenericConverter implements Converter {
      * @return
      */
     @Override
-    public List<Object> getToListSortBy(List sourceList, String attribute) {
+    public List<Object> getToListSortBy(List sourceList, String attribute, SortationType sortationType) {
         List<Object> retList = new ArrayList<>();
         for (Object sourceObj : sourceList) {
             retList.add(getTo(sourceObj));
         }
         retList.removeAll(Collections.singleton(null));
-        Collections.sort(retList, new ObjectComparator(attribute));
+        if (sortationType == null) {
+            sortationType = SortationType.ASCENDING;
+        }
+        Collections.sort(retList, new ObjectComparator(attribute, sortationType));
         return retList;
     }
 
@@ -189,13 +223,15 @@ public class GenericConverter implements Converter {
                         targetFieldInEntity.setAccessible(true);
                         List sourceList = (List) targetFieldInEntity.get(source);
                         target = new ArrayList();
-                        for (Object element : sourceList) {
-                            Object targetObjectInList = integerListClass.newInstance();
-                            Object newElement = setFieldValues(integerListClass.getDeclaredFields(), element, targetObjectInList);
-                            ((ArrayList) target).add(newElement);
+                        if (sourceList != null) {
+                            for (Object element : sourceList) {
+                                Object targetObjectInList = integerListClass.newInstance();
+                                Object newElement = setFieldValues(integerListClass.getDeclaredFields(), element, targetObjectInList);
+                                ((ArrayList) target).add(newElement);
+                            }
+                            toField.setAccessible(true);
+                            toField.set(oldTarget, target);
                         }
-                        toField.setAccessible(true);
-                        toField.set(oldTarget, target);
                     } else {
 
                         Field targetFieldInEntity = source.getClass().getDeclaredField(sourceField);
