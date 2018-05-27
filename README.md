@@ -26,4 +26,4 @@ usage :
         </code><br/>
 </code>
 
-<h3>Examples in com.norberth.examples package</h3>
+<h3>Examples in test package</h3>
