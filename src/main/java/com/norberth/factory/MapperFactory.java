@@ -1,7 +1,7 @@
 package com.norberth.factory;
 
 import com.norberth.exception.NoPackage;
-import com.norberth.service.GenericConverter;
+import com.norberth.core.DTOMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +13,16 @@ import java.util.logging.Logger;
  * @author Novanc Norberth
  * @version 1.0.0
  */
-public class GenericConverterFactory {
+public class MapperFactory {
 
-    private final Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
-    private List<GenericConverter> genericConverters;
-    private static GenericConverterFactory instance = null;
+    private final Logger logger = Logger.getLogger(DTOMapper.class.getSimpleName());
+    private List<DTOMapper> objectConverters;
+    private static MapperFactory instance = null;
     private String packageName = null;
     private boolean debug = false;
 
-    private GenericConverterFactory() {
-        genericConverters = new ArrayList<>();
+    private MapperFactory() {
+        objectConverters = new ArrayList<>();
     }
 
     public void setPackageName(String pckName) {
@@ -34,9 +34,9 @@ public class GenericConverterFactory {
      *
      * @return
      */
-    public static GenericConverterFactory getInstance() {
+    public static MapperFactory getInstance() {
         if (instance == null) {
-            instance = new GenericConverterFactory();
+            instance = new MapperFactory();
         }
         return instance;
     }
@@ -45,10 +45,10 @@ public class GenericConverterFactory {
      * Get converter of DTO class
      *
      * @param target (Class) - target DTO class
-     * @return - {@link GenericConverter} associated with the DTO class
+     * @return - {@link DTOMapper} associated with the DTO class
      * <b>Note : if none exists a new one is created and returned </b>
      */
-    public GenericConverter getConverter(Class target) {
+    public DTOMapper getConverter(Class target) {
         if (packageName == null) {
             if (isDebug())
                 try {
@@ -60,21 +60,21 @@ public class GenericConverterFactory {
         }
 
 
-        GenericConverter converter = null;
-        if (!genericConverters.contains(new GenericConverter(target, packageName, isDebug()))) {
-            converter = new GenericConverter(target, packageName, isDebug());
-            genericConverters.add(converter);
+        DTOMapper converter = null;
+        if (!objectConverters.contains(new DTOMapper(target, packageName, isDebug()))) {
+            converter = new DTOMapper(target, packageName, isDebug());
+            objectConverters.add(converter);
             if (isDebug())
                 logger.info(" Created new converter for class " + target.getSimpleName());
             return converter;
         } else
 
         {
-            for (GenericConverter genericConverter : genericConverters) {
-                if (genericConverter.equals(new GenericConverter(target, packageName, isDebug()))) {
+            for (DTOMapper objectConverter : objectConverters) {
+                if (objectConverter.equals(new DTOMapper(target, packageName, isDebug()))) {
                     if (isDebug())
-                        logger.info(" Found converter for " + target.getSimpleName() + " class " + genericConverter.getClass().getTypeName());
-                    return genericConverter;
+                        logger.info(" Found converter for " + target.getSimpleName() + " class " + objectConverter.getClass().getTypeName());
+                    return objectConverter;
                 }
             }
         }

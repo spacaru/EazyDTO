@@ -1,8 +1,8 @@
-package com.norberth.util.validator;
+package com.norberth.core.service;
 
 import java.lang.reflect.Field;
 
-public interface Mapper<T extends Enum> {
+public interface Mapper<T extends AttributeAccesorType> {
 
     /**
      * Returns the current action to perform based on field implementation
@@ -20,7 +20,7 @@ public interface Mapper<T extends Enum> {
     public T getAction(String[] fields);
 
     /**
-     * Return the field needed for an {@link Action} on a given {@link Object} source for a given value
+     * Return the field needed for an {@link AttributeAccesorType} on a given {@link Object} source for a given value
      *
      * @param action
      * @param source
@@ -30,14 +30,14 @@ public interface Mapper<T extends Enum> {
     Field getField(T action, Object source, String sourceField);
 
     /**
-     * @param action
+     * @param attributeAccesorType
      * @param target
      * @param sourceField
      * @return
      */
-    Field getTargetObjectField(Action action, Object target, String sourceField);
+    Field getTargetObjectField(AttributeAccesorType attributeAccesorType, Object target, String sourceField);
 
-    Object getSource(Action action, Object source, String sourceField, boolean inheritedField);
+    Object getSource(AttributeAccesorType attributeAccesorType, Object source, String sourceField, boolean inheritedField);
 
 
     Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField);

@@ -1,4 +1,4 @@
-package com.norberth.annotation;
+package com.norberth.core.annotation;
 
 import com.norberth.event.CustomEvent;
 

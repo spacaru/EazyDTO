@@ -1,4 +1,4 @@
-package com.norberth.util.comparator;
+package com.norberth.util;
 
 public enum SortationType {
     ASCENDING, DESCENDING

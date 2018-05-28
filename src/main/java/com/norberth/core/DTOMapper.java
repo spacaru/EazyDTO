@@ -1,14 +1,14 @@
-package com.norberth.service;
+package com.norberth.core;
 
-import com.norberth.annotation.MapAttribute;
-import com.norberth.annotation.MapList;
-import com.norberth.annotation.MapObject;
 import com.norberth.config.ConverterConfig;
+import com.norberth.core.annotation.MapAttribute;
+import com.norberth.core.annotation.MapList;
+import com.norberth.core.annotation.MapObject;
 import com.norberth.event.CustomEvent;
-import com.norberth.util.comparator.ObjectComparator;
-import com.norberth.util.comparator.SortationType;
-import com.norberth.util.validator.Action;
-import com.norberth.util.validator.ObjectMapper;
+import com.norberth.util.ObjectComparator;
+import com.norberth.util.SortationType;
+import com.norberth.core.service.AttributeAccesorType;
+import com.norberth.core.service.ObjectMapper;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -29,14 +29,14 @@ import java.util.logging.Logger;
  * @author Novanc Norberth
  * @version 1.0.0
  */
-public class GenericConverter implements Converter {
+public class DTOMapper implements Mapper {
 
-    private Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
+    private Logger logger = Logger.getLogger(DTOMapper.class.getSimpleName());
     private final Class type;
     private String packageName;
     private boolean isDebug;
 
-    public GenericConverter(Class type, String packageName, boolean isDebug) {
+    public DTOMapper(Class type, String packageName, boolean isDebug) {
         this.type = type;
         this.packageName = packageName;
         this.isDebug = isDebug;
@@ -100,7 +100,7 @@ public class GenericConverter implements Converter {
             }
         }
         if (t == null && isDebug) {
-            logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
+            logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject core.");
         }
         if (isDebug) {
             logger.log(Level.INFO, "Created object => " + t);
@@ -165,10 +165,10 @@ public class GenericConverter implements Converter {
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
                 String sourceField = f.getAnnotation(MapAttribute.class).value();
-                Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField);
-                currentSource = objectMapper.getSource(action, source, sourceField, false);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
+                Field field = objectMapper.getField(attributeAccesorType, source, sourceField);
+                currentSource = objectMapper.getSource(attributeAccesorType, source, sourceField, false);
+                Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
                 Object value = objectMapper.getValue(field, currentSource, false, null, false, targetObjectField);
                 if (field != null) {
                     field.setAccessible(true);
@@ -178,9 +178,9 @@ public class GenericConverter implements Converter {
             } else if (f.getAnnotation(MapList.class) != null) {
                 String sourceField = f.getAnnotation(MapList.class).value();
                 boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
-                Action action = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(action, source, sourceField);
-                Field targetObjectField = objectMapper.getTargetObjectField(action, target, f.getName());
+                AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
+                Field field = objectMapper.getField(attributeAccesorType, source, sourceField);
+                Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
                 Object value = objectMapper.getValue(field, source, true, sourceField, isInherited, targetObjectField);
                 if (field != null) {
                     field.setAccessible(true);
@@ -238,7 +238,7 @@ public class GenericConverter implements Converter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenericConverter converter = (GenericConverter) o;
+        DTOMapper converter = (DTOMapper) o;
         return Objects.equals(type, converter.type);
     }
 

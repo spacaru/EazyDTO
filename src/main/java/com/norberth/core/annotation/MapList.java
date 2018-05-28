@@ -1,4 +1,4 @@
-package com.norberth.annotation;
+package com.norberth.core.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @author Novanc Norberth
  * @version 1.0.0
- * MapList - annotation that should be used to map list of custom transfer objects from list of entities
+ * MapList - core that should be used to map list of custom transfer objects from list of entities
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

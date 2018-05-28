@@ -1,18 +1,19 @@
 package com.norberth.service;
 
-import com.norberth.entity.TestEntity;
-import com.norberth.entity.TestEntityTO;
+import com.norberth.core.DTOMapper;
+import com.norberth.entity.Entity;
+import com.norberth.entity.EntityDTO;
 import com.norberth.entity.TestObjectDataTypes;
 import com.norberth.entity.TestObjectDataTypesTO;
-import com.norberth.factory.GenericConverterFactory;
+import com.norberth.factory.MapperFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ConverterTest {
+public class MapperTest {
 
-    private GenericConverterFactory genericConverterFactory;
+    private MapperFactory genericMapperFactory;
     private static final String STRING_VALUE = "STRING_TEST";
     private static final Boolean BOOLEAN_VALUE = Boolean.TRUE;
     private static final Integer INTEGER_VALUE = Integer.valueOf(127);
@@ -22,9 +23,9 @@ public class ConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        genericConverterFactory = GenericConverterFactory.getInstance();
-        genericConverterFactory.setPackageName("com.norberth.entity");
-        genericConverterFactory.setDebug(true);
+        genericMapperFactory = MapperFactory.getInstance();
+        genericMapperFactory.setPackageName("com.norberth.entity");
+        genericMapperFactory.setDebug(true);
     }
 
     @After
@@ -37,15 +38,15 @@ public class ConverterTest {
         double dblValue =
                 DOUBLE_VALUE.doubleValue();
         float fltValue = FLOAT_VALUE.floatValue();
-        TestEntity testEntity = new TestEntity();
-        testEntity.setBoolTest(true);
-        testEntity.setIntTest(intValue);
-        testEntity.setDoubleTest(dblValue);
-        testEntity.setFloatTest(fltValue);
-        testEntity.setStringTest(STRING_VALUE);
+        Entity entity = new Entity();
+        entity.setBoolTest(true);
+        entity.setIntTest(intValue);
+        entity.setDoubleTest(dblValue);
+        entity.setFloatTest(fltValue);
+        entity.setStringTest(STRING_VALUE);
 
-        TestEntityTO
-                createdDTO = (TestEntityTO) genericConverterFactory.getConverter(TestEntityTO.class).getTo(testEntity);
+        EntityDTO
+                createdDTO = (EntityDTO) genericMapperFactory.getConverter(EntityDTO.class).getTo(entity);
         Assert.assertEquals(createdDTO.isBoolTest(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getIntTest(), intValue);
         Assert.assertEquals(createdDTO.getFloatTest(), fltValue, 0);
@@ -57,17 +58,17 @@ public class ConverterTest {
     @Test
     public void createToForObjectDataTypes() {
         TestObjectDataTypes testEntity = new TestObjectDataTypes();
-        TestEntity testEntity1 = new TestEntity();
-        testEntity1.setStringTest("str_test");
+        Entity entity1 = new Entity();
+        entity1.setStringTest("str_test");
         testEntity.setaBoolean(BOOLEAN_VALUE);
         testEntity.setaDouble(DOUBLE_VALUE);
         testEntity.setAnInteger(INTEGER_VALUE);
         testEntity.setaShort(SHORT_VALUE);
         testEntity.setAfloat(FLOAT_VALUE);
         testEntity.setString(STRING_VALUE);
-        testEntity.setTestEntity(testEntity1);
-        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericConverterFactory.getConverter(TestObjectDataTypesTO.class).getTo(testEntity);
-        Assert.assertEquals(createdDTO.getTestEntity().getStringTest(), "str_test");
+        testEntity.setEntity(entity1);
+        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericMapperFactory.getConverter(TestObjectDataTypesTO.class).getTo(testEntity);
+        Assert.assertEquals(createdDTO.getEntity().getStringTest(), "str_test");
         Assert.assertEquals(createdDTO.getaBoolean(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getInteger(), INTEGER_VALUE);
         Assert.assertEquals(createdDTO.getaDouble(), DOUBLE_VALUE, 0);
@@ -78,11 +79,11 @@ public class ConverterTest {
 
     @Test
     public void assertNoPackageErrorThrown() {
-        GenericConverterFactory genericConverterFactory = GenericConverterFactory.getInstance();
+        MapperFactory genericMapperFactory = MapperFactory.getInstance();
 //        reset package name
-        genericConverterFactory.setPackageName(null);
-        GenericConverter genericConverter = genericConverterFactory.getConverter(TestObjectDataTypesTO.class);
-        Assert.assertEquals(genericConverter, null);
+        genericMapperFactory.setPackageName(null);
+        DTOMapper objectConverter = genericMapperFactory.getConverter(TestObjectDataTypesTO.class);
+        Assert.assertEquals(objectConverter, null);
 
     }
 

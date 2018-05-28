@@ -1,10 +1,10 @@
 package com.norberth.entity;
 
-import com.norberth.annotation.MapAttribute;
-import com.norberth.annotation.MapObject;
+import com.norberth.core.annotation.MapAttribute;
+import com.norberth.core.annotation.MapObject;
 
-@MapObject(fromClass = TestEntity.class)
-public class TestEntityTO {
+@MapObject(fromClass = Entity.class)
+public class EntityDTO {
 
     @MapAttribute("intTest")
     private int intTest;
@@ -43,7 +43,7 @@ public class TestEntityTO {
 
     @Override
     public String toString() {
-        return "TestEntityTO{" +
+        return "EntityDTO{" +
                 "intTest=" + intTest +
                 ", doubleTest=" + doubleTest +
                 ", stringTest='" + stringTest + '\'' +

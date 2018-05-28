@@ -8,18 +8,18 @@ public class TestObjectDataTypes {
     private Short aShort;
     private Boolean aBoolean;
     private String string;
-    private TestEntity testEntity;
+    private Entity entity;
 
     public Boolean getaBoolean() {
         return aBoolean;
     }
 
-    public TestEntity getTestEntity() {
-        return testEntity;
+    public Entity getEntity() {
+        return entity;
     }
 
-    public void setTestEntity(TestEntity testEntity) {
-        this.testEntity = testEntity;
+    public void setEntity(Entity entity) {
+        this.entity = entity;
     }
 
     public Boolean getABoolean() {

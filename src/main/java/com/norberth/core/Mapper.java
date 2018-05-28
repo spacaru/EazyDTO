@@ -1,10 +1,10 @@
-package com.norberth.service;
+package com.norberth.core;
 
-import com.norberth.util.comparator.SortationType;
+import com.norberth.util.SortationType;
 
 import java.util.List;
 
-public interface Converter {
+public interface Mapper {
     /**
      * Returns the newly created TO from source object
      *

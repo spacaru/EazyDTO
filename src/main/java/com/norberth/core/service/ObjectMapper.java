@@ -1,4 +1,4 @@
-package com.norberth.util.validator;
+package com.norberth.core.service;
 
 import com.norberth.config.ConverterConfig;
 
@@ -10,31 +10,31 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
-public class ObjectMapper implements Mapper<Action> {
+public class ObjectMapper implements Mapper<AttributeAccesorType> {
 
     private static final Logger logger = Logger.getLogger(ObjectMapper.class.getSimpleName());
 
     @Override
-    public Action getAction(String field) {
-        Action action = null;
+    public AttributeAccesorType getAction(String field) {
+        AttributeAccesorType attributeAccesorType = null;
         if (field.contains(".")) {
-            action = Action.RECURSIVELY_SET_FIELDS;
+            attributeAccesorType = AttributeAccesorType.RECURSIVELY_SET_FIELDS;
         } else {
-            action = Action.SET_FIELDS;
+            attributeAccesorType = AttributeAccesorType.SET_FIELDS;
         }
-        return action;
+        return attributeAccesorType;
     }
 
     @Override
-    public Action getAction(String[] fields) {
-        return Action.RECURSIVELY_SET_FIELDS;
+    public AttributeAccesorType getAction(String[] fields) {
+        return AttributeAccesorType.RECURSIVELY_SET_FIELDS;
     }
 
     @Override
-    public Field getField(Action action, Object source, String sourceField) {
+    public Field getField(AttributeAccesorType attributeAccesorType, Object source, String sourceField) {
         Field retField = null;
         try {
-            switch (action) {
+            switch (attributeAccesorType) {
                 case SET_FIELDS:
                     if (source.getClass().isAssignableFrom(List.class)) {
                         System.out.println("bingo");
@@ -59,10 +59,10 @@ public class ObjectMapper implements Mapper<Action> {
 
 
     @Override
-    public Field getTargetObjectField(Action action, Object target, String sourceField) {
+    public Field getTargetObjectField(AttributeAccesorType attributeAccesorType, Object target, String sourceField) {
         Field retField = null;
         try {
-            switch (action) {
+            switch (attributeAccesorType) {
                 case RECURSIVELY_SET_FIELDS:
                     retField = target.getClass().getDeclaredField(sourceField);
                     break;
@@ -82,9 +82,9 @@ public class ObjectMapper implements Mapper<Action> {
     }
 
     @Override
-    public Object getSource(Action action, Object source, String sourceField, boolean inheritedField) {
+    public Object getSource(AttributeAccesorType attributeAccesorType, Object source, String sourceField, boolean inheritedField) {
         Object targetSource = null;
-        switch (action) {
+        switch (attributeAccesorType) {
             case SET_FIELDS:
                 targetSource = source;
                 break;
@@ -248,7 +248,7 @@ public class ObjectMapper implements Mapper<Action> {
             value = field.get(source);
         }
         if (value == null) {
-            logger.severe("Source entity " + source.getClass().getTypeName() + " has null value on field : '" + field.getName() + '\'' + " therefore we ignore @MapAttribute annotation on field '" + targetObjectField.getName() + "\'");
+            logger.severe("Source entity " + source.getClass().getTypeName() + " has null value on field : '" + field.getName() + '\'' + " therefore we ignore @MapAttribute core on field '" + targetObjectField.getName() + "\'");
         }
         return value;
     }

@@ -1,6 +1,6 @@
 package com.norberth.entity;
 
-public class TestEntity {
+public class Entity {
 
     //    primitive types
     private byte byteTest;

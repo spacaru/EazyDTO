@@ -1,4 +1,4 @@
-package com.norberth.util.comparator;
+package com.norberth.util;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
