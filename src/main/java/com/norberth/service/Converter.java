@@ -1,6 +1,6 @@
 package com.norberth.service;
 
-import com.norberth.util.SortationType;
+import com.norberth.util.comparator.SortationType;
 
 import java.util.List;
 

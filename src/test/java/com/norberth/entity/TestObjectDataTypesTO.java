@@ -1,4 +1,4 @@
-package com.norberth.test.entity;
+package com.norberth.entity;
 
 import com.norberth.annotation.MapAttribute;
 import com.norberth.annotation.MapObject;
@@ -18,6 +18,16 @@ public class TestObjectDataTypesTO {
     private Boolean aBoolean;
     @MapAttribute("string")
     private String string;
+    @MapAttribute("testEntity")
+    private TestEntity testEntity;
+
+    public TestEntity getTestEntity() {
+        return testEntity;
+    }
+
+    public void setTestEntity(TestEntity testEntity) {
+        this.testEntity = testEntity;
+    }
 
     public String getString() {
         return string;
@@ -76,6 +86,7 @@ public class TestObjectDataTypesTO {
                 ", aDouble=" + aDouble +
                 ", aBoolean=" + aBoolean +
                 ", string='" + string + '\'' +
+                ", testEntity=" + testEntity +
                 '}';
     }
 }

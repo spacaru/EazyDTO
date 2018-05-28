@@ -1,4 +1,4 @@
-package com.norberth.test.entity;
+package com.norberth.entity;
 
 import com.norberth.annotation.MapAttribute;
 import com.norberth.annotation.MapObject;

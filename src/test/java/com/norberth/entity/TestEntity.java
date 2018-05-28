@@ -1,4 +1,4 @@
-package com.norberth.test.entity;
+package com.norberth.entity;
 
 public class TestEntity {
 

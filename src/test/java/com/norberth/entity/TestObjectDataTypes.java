@@ -1,4 +1,4 @@
-package com.norberth.test.entity;
+package com.norberth.entity;
 
 public class TestObjectDataTypes {
 
@@ -8,6 +8,19 @@ public class TestObjectDataTypes {
     private Short aShort;
     private Boolean aBoolean;
     private String string;
+    private TestEntity testEntity;
+
+    public Boolean getaBoolean() {
+        return aBoolean;
+    }
+
+    public TestEntity getTestEntity() {
+        return testEntity;
+    }
+
+    public void setTestEntity(TestEntity testEntity) {
+        this.testEntity = testEntity;
+    }
 
     public Boolean getABoolean() {
         return aBoolean;

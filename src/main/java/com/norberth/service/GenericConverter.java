@@ -5,11 +5,10 @@ import com.norberth.annotation.MapList;
 import com.norberth.annotation.MapObject;
 import com.norberth.config.ConverterConfig;
 import com.norberth.event.CustomEvent;
-import com.norberth.factory.GenericConverterFactory;
-import com.norberth.util.ObjectComparator;
-import com.norberth.util.SortationType;
-import com.norberth.validator.Action;
-import com.norberth.validator.ObjectMapper;
+import com.norberth.util.comparator.ObjectComparator;
+import com.norberth.util.comparator.SortationType;
+import com.norberth.util.validator.Action;
+import com.norberth.util.validator.ObjectMapper;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -21,10 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,18 +34,14 @@ public class GenericConverter implements Converter {
     private Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
     private final Class type;
     private String packageName;
-    private boolean isTestPackage;
-    private boolean error = false;
+    private boolean isDebug;
 
-    public GenericConverter(Class type, String packageName) {
+    public GenericConverter(Class type, String packageName, boolean isDebug) {
         this.type = type;
         this.packageName = packageName;
+        this.isDebug = isDebug;
     }
 
-    public GenericConverter(Class type, boolean isTestPackage) {
-        this.isTestPackage = isTestPackage;
-        this.type = type;
-    }
 
     /**
      * Returns transfer object from source object
@@ -59,21 +51,7 @@ public class GenericConverter implements Converter {
      */
     @Override
     public Object getTo(Object source) {
-        URL testClassesURL = null;
-        try {
-            testClassesURL = Paths.get("target/test-classes").toUri().toURL();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{testClassesURL},
-                ClasspathHelper.staticClassLoader());
-        Collection<URL> urls = null;
-        if (packageName != null) {
-            urls = ClasspathHelper.forPackage(this.packageName);
-        } else {
-            urls = ClasspathHelper.forClassLoader((ClassLoader) classLoader);
-        }
+        Collection<URL> urls = ClasspathHelper.forPackage(this.packageName);
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(urls)
                 .setScanners(new SubTypesScanner(),
@@ -121,10 +99,10 @@ public class GenericConverter implements Converter {
                 }
             }
         }
-        if (t == null && GenericConverterFactory.isDebug()) {
+        if (t == null && isDebug) {
             logger.log(Level.WARNING, " No class of type" + type + " found annotated with @MapObject annotation.");
         }
-        if (GenericConverterFactory.isDebug()) {
+        if (isDebug) {
             logger.log(Level.INFO, "Created object => " + t);
         }
         return t;
@@ -292,7 +270,7 @@ public class GenericConverter implements Converter {
                 value += separator + currentValue;
             }
         }
-        if (GenericConverterFactory.isDebug()) {
+        if (isDebug) {
             logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
         }
         targetObjectField.set(target, value);

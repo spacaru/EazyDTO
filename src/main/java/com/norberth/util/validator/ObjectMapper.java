@@ -1,4 +1,4 @@
-package com.norberth.validator;
+package com.norberth.util.validator;
 
 import com.norberth.config.ConverterConfig;
 

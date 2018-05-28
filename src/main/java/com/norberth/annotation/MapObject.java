@@ -25,7 +25,8 @@ public @interface MapObject {
     public Class fromClass();
 
     /**
-     * The specified class must implement CustomEvent<Source S,Target T> interface.
+     * Specify a custom class which implements CustomEvent<Source,Target> interface
+     * to run custom code after the DTO has been mapped
      *
      * @return
      */

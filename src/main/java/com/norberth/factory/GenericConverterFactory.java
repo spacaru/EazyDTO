@@ -16,17 +16,16 @@ import java.util.logging.Logger;
 public class GenericConverterFactory {
 
     private final Logger logger = Logger.getLogger(GenericConverter.class.getSimpleName());
-    private static List<GenericConverter> genericConverters;
+    private List<GenericConverter> genericConverters;
     private static GenericConverterFactory instance = null;
-    private static String packageName = null;
-    private static boolean scanTestPackage;
-    private static boolean debug = false;
+    private String packageName = null;
+    private boolean debug = false;
 
     private GenericConverterFactory() {
         genericConverters = new ArrayList<>();
     }
 
-    public static void setPackageName(String pckName) {
+    public void setPackageName(String pckName) {
         packageName = pckName;
     }
 
@@ -50,10 +49,10 @@ public class GenericConverterFactory {
      * <b>Note : if none exists a new one is created and returned </b>
      */
     public GenericConverter getConverter(Class target) {
-        if (packageName == null && !isScanTestPackage()) {
+        if (packageName == null) {
             if (isDebug())
                 try {
-                    throw new NoPackage("Package not set. Set a package to scan for. Package example : com.norberth.examples");
+                    throw new NoPackage("Package not set. Set a package to scan for. Package example : com.norberth.examples or set this factory as test package by calling setScanTestPackage(true) ");
                 } catch (NoPackage noPackage) {
                     logger.severe(noPackage.getMessage());
                 }
@@ -61,20 +60,18 @@ public class GenericConverterFactory {
         }
 
 
-        if (!genericConverters.contains(new GenericConverter(target, packageName))) {
-            GenericConverter converter = null;
-            if (isScanTestPackage()) {
-                converter = new GenericConverter(target, true);
-            } else {
-                converter = new GenericConverter(target, packageName);
-            }
+        GenericConverter converter = null;
+        if (!genericConverters.contains(new GenericConverter(target, packageName, isDebug()))) {
+            converter = new GenericConverter(target, packageName, isDebug());
             genericConverters.add(converter);
             if (isDebug())
                 logger.info(" Created new converter for class " + target.getSimpleName());
             return converter;
-        } else {
+        } else
+
+        {
             for (GenericConverter genericConverter : genericConverters) {
-                if (genericConverter.equals(new GenericConverter(target, packageName))) {
+                if (genericConverter.equals(new GenericConverter(target, packageName, isDebug()))) {
                     if (isDebug())
                         logger.info(" Found converter for " + target.getSimpleName() + " class " + genericConverter.getClass().getTypeName());
                     return genericConverter;
@@ -84,7 +81,7 @@ public class GenericConverterFactory {
         return null;
     }
 
-    public static boolean isDebug() {
+    public boolean isDebug() {
         return debug;
     }
 
@@ -93,15 +90,11 @@ public class GenericConverterFactory {
      *
      * @param deb (boolean)- if set to true debug is enabled
      */
-    public static void setDebug(boolean deb) {
+    public void setDebug(boolean deb) {
         debug = deb;
     }
 
-    public static boolean isScanTestPackage() {
-        return scanTestPackage;
-    }
-
-    public static void setScanTestPackage(boolean scanTestPackage) {
-        GenericConverterFactory.scanTestPackage = scanTestPackage;
+    public String getPackageName() {
+        return packageName;
     }
 }

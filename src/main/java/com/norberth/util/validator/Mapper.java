@@ -1,4 +1,4 @@
-package com.norberth.validator;
+package com.norberth.util.validator;
 
 import java.lang.reflect.Field;
 
