@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
-public class ObjectMapper implements Mapper<AttributeAccesorType> {
+public class ObjectReflectiveMapper implements ReflectiveMapper<AttributeAccesorType> {
 
-    private static final Logger logger = Logger.getLogger(ObjectMapper.class.getSimpleName());
+    private static final Logger logger = Logger.getLogger(ObjectReflectiveMapper.class.getSimpleName());
 
     @Override
     public AttributeAccesorType getAction(String field) {

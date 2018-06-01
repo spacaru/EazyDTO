@@ -2,7 +2,7 @@ package com.norberth.core.service;
 
 import java.lang.reflect.Field;
 
-public interface Mapper<T extends AttributeAccesorType> {
+public interface ReflectiveMapper<T extends AttributeAccesorType> {
 
     /**
      * Returns the current action to perform based on field implementation
@@ -41,4 +41,5 @@ public interface Mapper<T extends AttributeAccesorType> {
 
 
     Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField);
+
 }

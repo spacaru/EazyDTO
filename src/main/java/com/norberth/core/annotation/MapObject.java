@@ -25,6 +25,13 @@ public @interface MapObject {
     public Class fromClass();
 
     /**
+     * SQL to run ( MapperFactory must have an entityManager set for this feature to work )
+     *
+     * @return
+     */
+    public String fromSql() default "";
+
+    /**
      * Specify a custom class which implements CustomEvent<Source,Target> interface
      * to run custom code after the DTO has been mapped
      *

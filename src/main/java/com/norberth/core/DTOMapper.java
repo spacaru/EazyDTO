@@ -4,17 +4,20 @@ import com.norberth.config.ConverterConfig;
 import com.norberth.core.annotation.MapAttribute;
 import com.norberth.core.annotation.MapList;
 import com.norberth.core.annotation.MapObject;
+import com.norberth.core.database.DatabaseWrapper;
+import com.norberth.core.database.SqlType;
+import com.norberth.core.service.AttributeAccesorType;
+import com.norberth.core.service.ObjectReflectiveMapper;
 import com.norberth.event.CustomEvent;
 import com.norberth.util.ObjectComparator;
 import com.norberth.util.SortationType;
-import com.norberth.core.service.AttributeAccesorType;
-import com.norberth.core.service.ObjectMapper;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import javax.persistence.EntityManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +38,8 @@ public class DTOMapper implements Mapper {
     private final Class type;
     private String packageName;
     private boolean isDebug;
+    private DatabaseWrapper databaseWrapper;
+    private EntityManager em;
 
     public DTOMapper(Class type, String packageName, boolean isDebug) {
         this.type = type;
@@ -76,7 +81,6 @@ public class DTOMapper implements Mapper {
 
                             t = m.invoke(customCodeClass.newInstance(), objArray);
                         } else {
-
                             logger.severe("Annotated class must implement CustomEvent<Source S,Target T> interface!");
                             logger.severe("Omitting postMap() method from class " + customCodeClass.getTypeName());
 
@@ -122,6 +126,45 @@ public class DTOMapper implements Mapper {
         return retList;
     }
 
+
+    public List getToListFromSql(SqlType sqlType, String sql) {
+
+        Collection<URL> urls = ClasspathHelper.forPackage(this.packageName);
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(urls)
+                .setScanners(new SubTypesScanner(),
+                        new TypeAnnotationsScanner()));
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(MapObject.class);
+        List retList = new ArrayList();
+        for (Class c : annotatedClasses) {
+            if (c.equals(type)) {
+                if (this.em == null) {
+                    logger.log(Level.SEVERE, "Entity manager not configured! Make sure to use the setEm() method to add an EntityManager to MapperFactory");
+                    return retList;
+                } else {
+                    databaseWrapper = new DatabaseWrapper(em);
+                }
+                Annotation transferObject = c.getAnnotation(MapObject.class);
+                Class targetClass = ((MapObject) transferObject).fromClass();
+                List entities = databaseWrapper.getObjectList(sql, targetClass,sqlType);
+                logger.log(Level.INFO, "Found " + entities.size() + " entities !");
+                if (entities.size() == 0) {
+                    return retList;
+                } else {
+                    retList = getToList(entities);
+                }
+            }
+
+        }
+        return retList;
+
+    }
+
+    @Override
+    public Object getToFromSql() {
+        return null;
+    }
+
     @Override
     public List<Object> getToListSortBy(List sourceList, String attribute) {
         return getToListSortBy(sourceList, attribute, null);
@@ -148,6 +191,37 @@ public class DTOMapper implements Mapper {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DTOMapper converter = (DTOMapper) o;
+        return Objects.equals(type, converter.type);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(type);
+    }
+
+    @Override
+    public Class getType() {
+        return type;
+    }
+
+
+    @Override
+    public EntityManager getEm() {
+        return em;
+    }
+
+    @Override
+    public void setEm(EntityManager em) {
+        this.em = em;
+    }
+
+
     /**
      * Sets values for list of {@link Field} annotated with {@link MapAttribute} on classes annotated with {@link MapObject}
      *
@@ -160,7 +234,7 @@ public class DTOMapper implements Mapper {
     private Object setFieldValues(Field[] fields, Object source, Object target) throws NoSuchFieldException, IllegalAccessException {
 
         Object currentSource = null;
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectReflectiveMapper objectMapper = new ObjectReflectiveMapper();
         Object oldTarget = target;
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
@@ -234,25 +308,6 @@ public class DTOMapper implements Mapper {
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DTOMapper converter = (DTOMapper) o;
-        return Objects.equals(type, converter.type);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(type);
-    }
-
-    public Class getType() {
-        return type;
-    }
-
-
     private void concatFieldsAndSetValue(Object source, Object target, Field f, String sourceField, String[] concatFields, Object value, String separator) throws NoSuchFieldException, IllegalAccessException {
         Field field;
         Field targetObjectField = target.getClass().getDeclaredField(f.getName());
@@ -283,5 +338,4 @@ public class DTOMapper implements Mapper {
         value = field.get(source);
         return value;
     }
-
 }

@@ -1,19 +1,19 @@
 package com.norberth.service;
 
-import com.norberth.core.DTOMapper;
+import com.norberth.core.Mapper;
 import com.norberth.entity.Entity;
 import com.norberth.entity.EntityDTO;
 import com.norberth.entity.TestObjectDataTypes;
 import com.norberth.entity.TestObjectDataTypesTO;
-import com.norberth.factory.MapperFactory;
+import com.norberth.factory.MapperFactoryImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MapperTest {
+public class ReflectiveMapperTest {
 
-    private MapperFactory genericMapperFactory;
+    private MapperFactoryImpl genericMapperFactoryImpl;
     private static final String STRING_VALUE = "STRING_TEST";
     private static final Boolean BOOLEAN_VALUE = Boolean.TRUE;
     private static final Integer INTEGER_VALUE = Integer.valueOf(127);
@@ -23,9 +23,9 @@ public class MapperTest {
 
     @Before
     public void setUp() throws Exception {
-        genericMapperFactory = MapperFactory.getInstance();
-        genericMapperFactory.setPackageName("com.norberth.entity");
-        genericMapperFactory.setDebug(true);
+        genericMapperFactoryImpl = MapperFactoryImpl.getInstance();
+        genericMapperFactoryImpl.setPackageName("com.norberth.entity");
+        genericMapperFactoryImpl.setDebug(true);
     }
 
     @After
@@ -46,7 +46,7 @@ public class MapperTest {
         entity.setStringTest(STRING_VALUE);
 
         EntityDTO
-                createdDTO = (EntityDTO) genericMapperFactory.getConverter(EntityDTO.class).getTo(entity);
+                createdDTO = (EntityDTO) genericMapperFactoryImpl.getConverter(EntityDTO.class).getTo(entity);
         Assert.assertEquals(createdDTO.isBoolTest(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getIntTest(), intValue);
         Assert.assertEquals(createdDTO.getFloatTest(), fltValue, 0);
@@ -67,7 +67,7 @@ public class MapperTest {
         testEntity.setAfloat(FLOAT_VALUE);
         testEntity.setString(STRING_VALUE);
         testEntity.setEntity(entity1);
-        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericMapperFactory.getConverter(TestObjectDataTypesTO.class).getTo(testEntity);
+        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericMapperFactoryImpl.getConverter(TestObjectDataTypesTO.class).getTo(testEntity);
         Assert.assertEquals(createdDTO.getEntity().getStringTest(), "str_test");
         Assert.assertEquals(createdDTO.getaBoolean(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getInteger(), INTEGER_VALUE);
@@ -79,10 +79,10 @@ public class MapperTest {
 
     @Test
     public void assertNoPackageErrorThrown() {
-        MapperFactory genericMapperFactory = MapperFactory.getInstance();
+        MapperFactoryImpl genericMapperFactoryImpl = MapperFactoryImpl.getInstance();
 //        reset package name
-        genericMapperFactory.setPackageName(null);
-        DTOMapper objectConverter = genericMapperFactory.getConverter(TestObjectDataTypesTO.class);
+        genericMapperFactoryImpl.setPackageName(null);
+        Mapper objectConverter = genericMapperFactoryImpl.getConverter(TestObjectDataTypesTO.class);
         Assert.assertEquals(objectConverter, null);
 
     }

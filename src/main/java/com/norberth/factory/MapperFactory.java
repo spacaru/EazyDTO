@@ -1,45 +1,29 @@
 package com.norberth.factory;
 
-import com.norberth.exception.NoPackage;
 import com.norberth.core.DTOMapper;
+import com.norberth.core.Mapper;
+import com.norberth.core.MapperType;
+import com.norberth.exception.NoPackage;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Singleton provider factory class for generic converters of DTO (data transport object) classes
+ * Mapper interface for returning all types of Mappers
  *
- * @author Novanc Norberth
+ * @author Norberth Novanc
  * @version 1.0.0
  */
-public class MapperFactory {
+public abstract class MapperFactory {
+    private final Logger logger = Logger.getLogger(MapperFactory.class.getSimpleName());
+    protected String packageName;
+    protected boolean isDebugEnabled;
+    protected List<Mapper> mappers;
+    //    default mapper type is dto
+    protected MapperType mapperType = MapperType.DTOMapper;
+    protected EntityManager entityManager;
 
-    private final Logger logger = Logger.getLogger(DTOMapper.class.getSimpleName());
-    private List<DTOMapper> objectConverters;
-    private static MapperFactory instance = null;
-    private String packageName = null;
-    private boolean debug = false;
-
-    private MapperFactory() {
-        objectConverters = new ArrayList<>();
-    }
-
-    public void setPackageName(String pckName) {
-        packageName = pckName;
-    }
-
-    /**
-     * Get factory instance
-     *
-     * @return
-     */
-    public static MapperFactory getInstance() {
-        if (instance == null) {
-            instance = new MapperFactory();
-        }
-        return instance;
-    }
 
     /**
      * Get converter of DTO class
@@ -48,7 +32,7 @@ public class MapperFactory {
      * @return - {@link DTOMapper} associated with the DTO class
      * <b>Note : if none exists a new one is created and returned </b>
      */
-    public DTOMapper getConverter(Class target) {
+    public Mapper getConverter(Class target) {
         if (packageName == null) {
             if (isDebug())
                 try {
@@ -60,41 +44,69 @@ public class MapperFactory {
         }
 
 
-        DTOMapper converter = null;
-        if (!objectConverters.contains(new DTOMapper(target, packageName, isDebug()))) {
-            converter = new DTOMapper(target, packageName, isDebug());
-            objectConverters.add(converter);
+        Mapper mapper = null;
+        if (!mappers.contains(new DTOMapper(target, packageName, isDebug()))) {
+            switch (mapperType) {
+                case DTOMapper:
+
+                    mapper = new DTOMapper(target, packageName, isDebug());
+                    mapper.setEm(entityManager);
+                    mappers.add(mapper);
+                    break;
+            }
             if (isDebug())
                 logger.info(" Created new converter for class " + target.getSimpleName());
-            return converter;
+            return mapper;
         } else
 
         {
-            for (DTOMapper objectConverter : objectConverters) {
-                if (objectConverter.equals(new DTOMapper(target, packageName, isDebug()))) {
-                    if (isDebug())
-                        logger.info(" Found converter for " + target.getSimpleName() + " class " + objectConverter.getClass().getTypeName());
-                    return objectConverter;
+            for (Mapper objectConverter : mappers) {
+                switch (mapperType) {
+                    case DTOMapper:
+                        if (objectConverter.equals(new DTOMapper(target, packageName, isDebug()))) {
+                            if (isDebug())
+                                logger.info(" Found converter for " + target.getSimpleName() + " class " + objectConverter.getClass().getTypeName());
+                        }
+                        return objectConverter;
+                    default:
+                        logger.warning("Unknown mapper type specified");
+
                 }
             }
         }
         return null;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
     /**
-     * Method to enable logging for debugging purposes
+     * Package to scan for annotations
      *
-     * @param deb (boolean)- if set to true debug is enabled
+     * @param pckName
      */
-    public void setDebug(boolean deb) {
-        debug = deb;
+    public void setPackageName(String pckName) {
+        this.packageName = pckName;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public void setDebug(boolean deb) {
+        this.isDebugEnabled = deb;
+    }
+
+    public boolean isDebug() {
+        return this.isDebugEnabled;
+    }
+
+    public MapperType getMapperType() {
+        return mapperType;
+    }
+
+    public void setMapperType(MapperType mapperType) {
+        this.mapperType = mapperType;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 }
