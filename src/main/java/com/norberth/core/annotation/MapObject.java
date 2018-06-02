@@ -22,14 +22,14 @@ public @interface MapObject {
      *
      * @return source entity class
      */
-    public Class fromClass();
+    Class fromClass();
 
     /**
      * SQL to run ( MapperFactory must have an entityManager set for this feature to work )
      *
      * @return
      */
-    public String fromSql() default "";
+    String fromSql() default "";
 
     /**
      * Specify a custom class which implements CustomEvent<Source,Target> interface
@@ -37,7 +37,7 @@ public @interface MapObject {
      *
      * @return
      */
-    public Class customMapperClass() default CustomEvent.class;
+    Class customMapperClass() default CustomEvent.class;
 
     /**
      * Target entity field

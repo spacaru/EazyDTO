@@ -22,12 +22,12 @@ public class ReflectiveMapperTest {
     private static final Float FLOAT_VALUE = Float.valueOf(123.34457335f);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         genericMapperFactoryImpl = MapperFactoryImpl.withPackageName("com.norberth.entity").withDebugEnabled(true).build();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
     @Test

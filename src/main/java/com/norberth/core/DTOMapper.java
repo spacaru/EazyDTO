@@ -146,7 +146,7 @@ public class DTOMapper implements Mapper {
                 }
                 Annotation transferObject = c.getAnnotation(MapObject.class);
                 Class targetClass = ((MapObject) transferObject).fromClass();
-                List entities = databaseWrapper.getObjectList(sql, targetClass,sqlType);
+                List entities = databaseWrapper.getObjectList(sql, targetClass, sqlType);
                 logger.log(Level.INFO, "Found " + entities.size() + " entities !");
                 if (entities.size() == 0) {
                     return retList;

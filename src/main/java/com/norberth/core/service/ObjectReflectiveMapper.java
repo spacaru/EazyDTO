@@ -185,7 +185,7 @@ public class ObjectReflectiveMapper implements ReflectiveMapper<AttributeAccesor
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
                     if (source instanceof List) {
-                        List newList = new ArrayList();
+                        List<Object> newList = new ArrayList<>();
                         for (Object obj : (List) source) {
                             Object sourceObject = obj.getClass().newInstance();
                             Field sourceField = null;

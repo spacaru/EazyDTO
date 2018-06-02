@@ -15,9 +15,9 @@ public interface ReflectiveMapper<T extends AttributeAccesorType> {
      * @param field
      * @return
      */
-    public T getAction(String field);
+    T getAction(String field);
 
-    public T getAction(String[] fields);
+    T getAction(String[] fields);
 
     /**
      * Return the field needed for an {@link AttributeAccesorType} on a given {@link Object} source for a given value

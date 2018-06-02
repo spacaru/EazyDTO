@@ -19,12 +19,12 @@ public @interface MapList {
      *
      * @return
      */
-    public String value();
+    String value();
 
     /**
      * Set this flag to true when mappedField is inherited from superclass
      *
      * @return
      */
-    public boolean inheritedField() default false;
+    boolean inheritedField() default false;
 }
