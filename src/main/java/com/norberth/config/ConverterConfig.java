@@ -7,8 +7,8 @@ package com.norberth.config;
  */
 public abstract class ConverterConfig {
 
-    private static String ESCAPED_NAME_DELIMITER = "\\.";
-    private static String NAME_DELIMITER = ".";
+    private static final String ESCAPED_NAME_DELIMITER = "\\.";
+    private static final String NAME_DELIMITER = ".";
     private static final String SEPARATOR = " ";
 
     public static String getEscapedNameDelimiter() {

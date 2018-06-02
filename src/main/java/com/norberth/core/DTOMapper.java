@@ -34,10 +34,10 @@ import java.util.logging.Logger;
  */
 public class DTOMapper implements Mapper {
 
-    private Logger logger = Logger.getLogger(DTOMapper.class.getSimpleName());
+    private final Logger logger = Logger.getLogger(DTOMapper.class.getSimpleName());
     private final Class type;
-    private String packageName;
-    private boolean isDebug;
+    private final String packageName;
+    private final boolean isDebug;
     private DatabaseWrapper databaseWrapper;
     private EntityManager em;
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DatabaseWrapper {
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public DatabaseWrapper(EntityManager entityManager) {
         this.entityManager = entityManager;

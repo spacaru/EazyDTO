@@ -5,8 +5,8 @@ import java.util.Comparator;
 
 public class ObjectComparator implements Comparator<Object> {
 
-    private String objectAttribute;
-    private SortationType sortationType;
+    private final String objectAttribute;
+    private final SortationType sortationType;
 
     public ObjectComparator(String objectAttribute, SortationType sortationType) {
         this.objectAttribute = objectAttribute;
