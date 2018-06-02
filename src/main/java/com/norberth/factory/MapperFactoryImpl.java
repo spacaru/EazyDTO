@@ -1,5 +1,8 @@
 package com.norberth.factory;
 
+import com.norberth.core.MapperType;
+
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +26,7 @@ public class MapperFactoryImpl extends MapperFactory {
      *
      * @return
      */
-    public static MapperFactoryImpl getInstance() {
+    private static MapperFactoryImpl getInstance() {
         if (instance == null) {
             instance = new MapperFactoryImpl();
         }
@@ -31,11 +34,32 @@ public class MapperFactoryImpl extends MapperFactory {
     }
 
     public static MapperFactoryImpl withPackageName(String packageName) {
+        getInstance();
         instance.packageName = packageName;
         return instance;
     }
 
-//    todo : implement other setters in here
+    public static MapperFactoryImpl withDebugEnabled(boolean isDebugEnabled) {
+        getInstance();
+        instance.isDebugEnabled = isDebugEnabled;
+        return instance;
+    }
+
+    public static MapperFactoryImpl withMapperType(MapperType mapperType) {
+        getInstance();
+        instance.mapperType = mapperType;
+        return instance;
+    }
+
+    public static MapperFactoryImpl withEntityManager(EntityManager entityManager) {
+        getInstance();
+        instance.entityManager = entityManager;
+        return instance;
+    }
+
+    public static MapperFactoryImpl build() {
+        return instance;
+    }
 
 
 }

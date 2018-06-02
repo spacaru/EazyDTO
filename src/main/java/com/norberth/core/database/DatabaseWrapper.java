@@ -15,13 +15,15 @@ public class DatabaseWrapper {
     public List getObjectList(String sql, Class targetClass, SqlType sqlType) {
         Query q = null;
         switch (sqlType) {
-            case NAMED:
-                q = entityManager.createNamedQuery(sql, targetClass);
+            case JPQL:
+                q = entityManager.createQuery(sql, targetClass);
                 break;
             case NATIVE:
                 q = entityManager.createNativeQuery(sql, targetClass);
 //                    TODO : add support for parameters
                 break;
+            case NAMED:
+                q = entityManager.createNamedQuery(sql, targetClass);
         }
         return q.getResultList();
     }

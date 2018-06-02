@@ -23,9 +23,7 @@ public class ReflectiveMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        genericMapperFactoryImpl = MapperFactoryImpl.getInstance();
-        genericMapperFactoryImpl.setPackageName("com.norberth.entity");
-        genericMapperFactoryImpl.setDebug(true);
+        genericMapperFactoryImpl = MapperFactoryImpl.withPackageName("com.norberth.entity").withDebugEnabled(true).build();
     }
 
     @After
@@ -46,7 +44,7 @@ public class ReflectiveMapperTest {
         entity.setStringTest(STRING_VALUE);
 
         EntityDTO
-                createdDTO = (EntityDTO) genericMapperFactoryImpl.getConverter(EntityDTO.class).getTo(entity);
+                createdDTO = (EntityDTO) genericMapperFactoryImpl.getMapper(EntityDTO.class).getTo(entity);
         Assert.assertEquals(createdDTO.isBoolTest(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getIntTest(), intValue);
         Assert.assertEquals(createdDTO.getFloatTest(), fltValue, 0);
@@ -67,7 +65,7 @@ public class ReflectiveMapperTest {
         testEntity.setAfloat(FLOAT_VALUE);
         testEntity.setString(STRING_VALUE);
         testEntity.setEntity(entity1);
-        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericMapperFactoryImpl.getConverter(TestObjectDataTypesTO.class).getTo(testEntity);
+        TestObjectDataTypesTO createdDTO = (TestObjectDataTypesTO) genericMapperFactoryImpl.getMapper(TestObjectDataTypesTO.class).getTo(testEntity);
         Assert.assertEquals(createdDTO.getEntity().getStringTest(), "str_test");
         Assert.assertEquals(createdDTO.getaBoolean(), BOOLEAN_VALUE);
         Assert.assertEquals(createdDTO.getInteger(), INTEGER_VALUE);
@@ -79,10 +77,9 @@ public class ReflectiveMapperTest {
 
     @Test
     public void assertNoPackageErrorThrown() {
-        MapperFactoryImpl genericMapperFactoryImpl = MapperFactoryImpl.getInstance();
+        MapperFactoryImpl genericMapperFactoryImpl = MapperFactoryImpl.withPackageName(null).build();
 //        reset package name
-        genericMapperFactoryImpl.setPackageName(null);
-        Mapper objectConverter = genericMapperFactoryImpl.getConverter(TestObjectDataTypesTO.class);
+        Mapper objectConverter = genericMapperFactoryImpl.getMapper(TestObjectDataTypesTO.class);
         Assert.assertEquals(objectConverter, null);
 
     }
