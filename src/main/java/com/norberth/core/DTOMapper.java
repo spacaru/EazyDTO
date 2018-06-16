@@ -6,7 +6,7 @@ import com.norberth.core.annotation.MapObject;
 import com.norberth.core.database.DatabaseWrapper;
 import com.norberth.core.database.SqlType;
 import com.norberth.core.service.AttributeAccesorType;
-import com.norberth.core.service.ObjectReflectiveMapper;
+import com.norberth.core.service.ObjectMapper;
 import com.norberth.core.service.ResourceSharingService;
 import com.norberth.event.CustomEvent;
 import com.norberth.util.ObjectComparator;
@@ -234,7 +234,7 @@ public class DTOMapper implements Mapper {
     private Object setFieldValues(Field[] fields, Object source, Object target) throws NoSuchFieldException, IllegalAccessException {
 
         Object currentSource = null;
-        ObjectReflectiveMapper objectMapper = new ObjectReflectiveMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         Object oldTarget = target;
         for (Field f : fields) {
             if (f.getAnnotation(MapAttribute.class) != null) {
@@ -282,7 +282,7 @@ public class DTOMapper implements Mapper {
         return target;
     }
 
-    private void mapList(Object source, Object target, ObjectReflectiveMapper objectMapper, Field f) throws IllegalAccessException {
+    private void mapList(Object source, Object target, ObjectMapper objectMapper, Field f) throws IllegalAccessException {
         String sourceField = f.getAnnotation(MapObject.class).value();
         AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
         ResourceSharingService resourceSharingService = new ResourceSharingService();
