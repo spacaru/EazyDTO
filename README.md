@@ -30,5 +30,27 @@ usage :
      <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth"); </code></br>
 
 <h3> Generic converter usage </h3></br>
+
+<h4>EntityDTO.class</h4>
+<code>
+@MapObject(fromClass = Entity.class)
+public class EntityDTO {
+
+    @MapAttribute("intTest")
+    private int intTest;
+    @MapAttribute("doubleTest")
+
+    private double doubleTest;
+    @MapAttribute("stringTest")
+
+    private String stringTest;
+    @MapAttribute("floatTest")
+
+    private float floatTest;
+    @MapAttribute("boolTest")
+
+    private boolean boolTest;
+</code>
+
  <code>  EntityDTO createdDTO = (EntityDTO) genericMapperFactoryImpl.getMapper(EntityDTO.class).getTo(entity);</code></br>
 <h3>Examples in test package</h3>
