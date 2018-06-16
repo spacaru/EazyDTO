@@ -27,7 +27,7 @@ usage :
 3. Add the generated jar to your project
 
 <h2>Mapper factory initialization</h2>
-     <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth"); </code></br>
+     <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).scanPackage("com.norberth"); </code></br>
 
 
 <h4>Fragment from EntityDTO class</h4>
