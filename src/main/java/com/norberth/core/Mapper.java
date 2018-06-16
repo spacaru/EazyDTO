@@ -1,7 +1,7 @@
 package com.norberth.core;
 
 import com.norberth.core.database.SqlType;
-import com.norberth.util.SortationType;
+import com.norberth.util.SortingType;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -26,16 +26,24 @@ public interface Mapper {
     /**
      * Returns List of TO objects created from entities retrieved by query
      *
-     * @param sqlType
-     * @param sql
+     * @param sqlType - type of sql query ( native , named , jpql )
+     * @param sql     - query to be performed
      * @return
      */
     List getToListFromSql(SqlType sqlType, String sql);
 
-    Object getToFromSql();
+    /**
+     * Returns single TO from sql ( applies limit 1 to sql )
+     *
+     * @param sqlType
+     * @param sql
+     * @return
+     */
+    Object getToFromSql(SqlType sqlType, String sql);
 
     /**
      * Returns the sorted TO list from the input sourceList , sorted by the given attribute
+     * This method applies ASCENDING sorting to the list
      *
      * @param sourceList
      * @param attribute
@@ -48,10 +56,10 @@ public interface Mapper {
      *
      * @param sourceList
      * @param attribute
-     * @param sortationType
+     * @param sortingType
      * @return
      */
-    List<Object> getToListSortBy(List sourceList, String attribute, SortationType sortationType);
+    List<Object> getToListSortBy(List sourceList, String attribute, SortingType sortingType);
 
     /**
      * Returns the target class for mapper

@@ -6,11 +6,11 @@ import java.util.Comparator;
 public class ObjectComparator implements Comparator<Object> {
 
     private final String objectAttribute;
-    private final SortationType sortationType;
+    private final SortingType sortingType;
 
-    public ObjectComparator(String objectAttribute, SortationType sortationType) {
+    public ObjectComparator(String objectAttribute, SortingType sortingType) {
         this.objectAttribute = objectAttribute;
-        this.sortationType = sortationType;
+        this.sortingType = sortingType;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class ObjectComparator implements Comparator<Object> {
             o2Field.setAccessible(true);
             Object o1Value = o1Field.get(o1);
             Object o2Value = o2Field.get(o2);
-            if (sortationType.equals(SortationType.ASCENDING)) {
+            if (sortingType.equals(SortingType.ASCENDING)) {
                 return o1Value.toString().compareTo(o2Value.toString());
             } else {
                 return o2Value.toString().compareTo(o1Value.toString());

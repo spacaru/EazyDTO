@@ -31,7 +31,7 @@ public class ObjectReflectiveMapper implements ReflectiveMapper<AttributeAccesor
     }
 
     @Override
-    public Field getField(AttributeAccesorType attributeAccesorType, Object source, String sourceField) {
+    public Field getField(AttributeAccesorType attributeAccesorType, Object source, String sourceField, ResourceSharingService resourceSharingService) {
         Field retField = null;
         try {
             switch (attributeAccesorType) {
@@ -49,6 +49,7 @@ public class ObjectReflectiveMapper implements ReflectiveMapper<AttributeAccesor
         } catch (NoSuchFieldException e) {
             try {
                 retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
+                resourceSharingService.setIS_INHERITED(true);
                 return retField;
             } catch (NoSuchFieldException e1) {
                 e1.printStackTrace();
@@ -123,11 +124,13 @@ public class ObjectReflectiveMapper implements ReflectiveMapper<AttributeAccesor
                 currField = currentField;
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
-                    if (source != null) {
+                    if (source != null && !source.getClass().getTypeName().contains("List")) {
                         f = source.getClass().getDeclaredField(currentField);
                         return f;
                     } else {
-                        return null;
+                        Object obj = ((List) source).get(0);
+                        f = obj.getClass().getDeclaredField(currentField);
+                        return f;
                     }
                 } else {
                     Field targetField = source.getClass().getDeclaredField(currentField);

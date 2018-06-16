@@ -1,5 +1,5 @@
 package com.norberth.util;
 
-public enum SortationType {
+public enum SortingType {
     ASCENDING, DESCENDING
 }

@@ -33,22 +33,19 @@ public abstract class MapperFactory {
      * <b>Note : if none exists a new one is created and returned </b>
      */
     public Mapper getMapper(Class target) {
+        Mapper mapper = null;
         if (packageName == null) {
             if (isDebugEnabled)
                 try {
-                    throw new NoPackage("Package not set. Set a package to scan for. Package example : com.norberth.examples or set this factory as test package by calling setScanTestPackage(true) ");
+                    throw new NoPackage("Package not set. Set a package to scan for. Package example : 'com.norberth.examples' ");
                 } catch (NoPackage noPackage) {
                     logger.severe(noPackage.getMessage());
                 }
-            return null;
+            return mapper;
         }
-
-
-        Mapper mapper = null;
         if (!mappers.contains(new DTOMapper(target, packageName, isDebugEnabled))) {
             switch (mapperType) {
                 case DTOMapper:
-
                     mapper = new DTOMapper(target, packageName, isDebugEnabled);
                     mapper.setEm(entityManager);
                     mappers.add(mapper);
@@ -56,20 +53,24 @@ public abstract class MapperFactory {
             }
             if (isDebugEnabled)
                 logger.info(" Created new converter for class " + target.getSimpleName());
-            return mapper;
         } else {
-            for (Mapper objectConverter : mappers) {
-                switch (mapperType) {
-                    case DTOMapper:
-                        if (objectConverter.equals(new DTOMapper(target, packageName, isDebugEnabled))) {
-                            if (isDebugEnabled)
-                                logger.info(" Found converter for " + target.getSimpleName() + " class " + objectConverter.getClass().getTypeName());
-                        }
-                        return objectConverter;
-                    default:
-                        logger.warning("Unknown mapper type specified");
+            mapper = getMapperFromList(target);
+        }
+        return mapper;
+    }
 
-                }
+    private Mapper getMapperFromList(Class target) {
+        for (Mapper objectConverter : mappers) {
+            switch (mapperType) {
+                case DTOMapper:
+                    if (objectConverter.equals(new DTOMapper(target, packageName, isDebugEnabled))) {
+                        if (isDebugEnabled)
+                            logger.info(" Found converter for " + target.getSimpleName() + " class " + objectConverter.getClass().getTypeName());
+                    }
+                    return objectConverter;
+                default:
+                    logger.warning("Unknown mapper type specified");
+
             }
         }
         return null;

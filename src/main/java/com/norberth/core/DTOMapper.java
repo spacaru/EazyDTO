@@ -1,6 +1,5 @@
 package com.norberth.core;
 
-import com.norberth.config.ConverterConfig;
 import com.norberth.core.annotation.MapAttribute;
 import com.norberth.core.annotation.MapList;
 import com.norberth.core.annotation.MapObject;
@@ -8,9 +7,10 @@ import com.norberth.core.database.DatabaseWrapper;
 import com.norberth.core.database.SqlType;
 import com.norberth.core.service.AttributeAccesorType;
 import com.norberth.core.service.ObjectReflectiveMapper;
+import com.norberth.core.service.ResourceSharingService;
 import com.norberth.event.CustomEvent;
 import com.norberth.util.ObjectComparator;
-import com.norberth.util.SortationType;
+import com.norberth.util.SortingType;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -22,7 +22,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
@@ -161,13 +160,14 @@ public class DTOMapper implements Mapper {
     }
 
     @Override
-    public Object getToFromSql() {
+    public Object getToFromSql(SqlType sqlType, String sql) {
         return null;
     }
 
+
     @Override
     public List<Object> getToListSortBy(List sourceList, String attribute) {
-        return getToListSortBy(sourceList, attribute, null);
+        return getToListSortBy(sourceList, attribute, SortingType.ASCENDING);
     }
 
 
@@ -177,16 +177,16 @@ public class DTOMapper implements Mapper {
      * @return
      */
     @Override
-    public List<Object> getToListSortBy(List sourceList, String attribute, SortationType sortationType) {
+    public List<Object> getToListSortBy(List sourceList, String attribute, SortingType sortingType) {
         List<Object> retList = new ArrayList<>();
         for (Object sourceObj : sourceList) {
             retList.add(getTo(sourceObj));
         }
         retList.removeAll(Collections.singleton(null));
-        if (sortationType == null) {
-            sortationType = SortationType.ASCENDING;
+        if (sortingType == null) {
+            sortingType = SortingType.ASCENDING;
         }
-        Collections.sort(retList, new ObjectComparator(attribute, sortationType));
+        Collections.sort(retList, new ObjectComparator(attribute, sortingType));
         return retList;
     }
 
@@ -240,7 +240,7 @@ public class DTOMapper implements Mapper {
             if (f.getAnnotation(MapAttribute.class) != null) {
                 String sourceField = f.getAnnotation(MapAttribute.class).value();
                 AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(attributeAccesorType, source, sourceField);
+                Field field = objectMapper.getField(attributeAccesorType, source, sourceField, new ResourceSharingService());
                 currentSource = objectMapper.getSource(attributeAccesorType, source, sourceField, false);
                 Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
                 Object value = objectMapper.getValue(field, currentSource, false, null, false, targetObjectField);
@@ -250,17 +250,7 @@ public class DTOMapper implements Mapper {
                 targetObjectField.setAccessible(true);
                 targetObjectField.set(target, value);
             } else if (f.getAnnotation(MapList.class) != null) {
-                String sourceField = f.getAnnotation(MapList.class).value();
-                boolean isInherited = f.getAnnotation(MapList.class).inheritedField();
-                AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
-                Field field = objectMapper.getField(attributeAccesorType, source, sourceField);
-                Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
-                Object value = objectMapper.getValue(field, source, true, sourceField, isInherited, targetObjectField);
-                if (field != null) {
-                    field.setAccessible(true);
-                }
-                targetObjectField.setAccessible(true);
-                targetObjectField.set(target, value);
+                mapList(source, target, objectMapper, f);
             } else if (f.getAnnotation(MapObject.class) != null) {
                 Annotation mapObject = f.getAnnotation(MapObject.class);
                 Class c = ((MapObject) mapObject).fromClass();
@@ -268,22 +258,7 @@ public class DTOMapper implements Mapper {
                 try {
                     Field toField = oldTarget.getClass().getDeclaredField(f.getName());
                     if (f.getType().equals(List.class)) {
-//                        target = new ArrayList<>();
-                        ParameterizedType integerListType = (ParameterizedType) f.getGenericType();
-                        Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
-                        Field targetFieldInEntity = source.getClass().getDeclaredField(sourceField);
-                        targetFieldInEntity.setAccessible(true);
-                        List sourceList = (List) targetFieldInEntity.get(source);
-                        target = new ArrayList();
-                        if (sourceList != null) {
-                            for (Object element : sourceList) {
-                                Object targetObjectInList = integerListClass.newInstance();
-                                Object newElement = setFieldValues(integerListClass.getDeclaredFields(), element, targetObjectInList);
-                                ((ArrayList) target).add(newElement);
-                            }
-                            toField.setAccessible(true);
-                            toField.set(oldTarget, target);
-                        }
+                        mapList(source, target, objectMapper, f);
                     } else {
 
                         Field targetFieldInEntity = source.getClass().getDeclaredField(sourceField);
@@ -307,35 +282,17 @@ public class DTOMapper implements Mapper {
         return target;
     }
 
-
-    private void concatFieldsAndSetValue(Object source, Object target, Field f, String sourceField, String[] concatFields, Object value, String separator) throws NoSuchFieldException, IllegalAccessException {
-        Field field;
-        Field targetObjectField = target.getClass().getDeclaredField(f.getName());
-        Field srcField = source.getClass().getDeclaredField(sourceField);
-        Object sourceValue = getFieldValue(srcField, source);
-        value = value != null ? value : "" + sourceValue;
-        for (String str : concatFields) {
-            field = source.getClass().getDeclaredField(str);
+    private void mapList(Object source, Object target, ObjectReflectiveMapper objectMapper, Field f) throws IllegalAccessException {
+        String sourceField = f.getAnnotation(MapObject.class).value();
+        AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
+        ResourceSharingService resourceSharingService = new ResourceSharingService();
+        Field field = objectMapper.getField(attributeAccesorType, source, sourceField, resourceSharingService);
+        Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
+        Object value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField);
+        if (field != null) {
             field.setAccessible(true);
-            targetObjectField.setAccessible(true);
-            srcField.setAccessible(true);
-            if (!sourceField.contains(".")) {
-                Object currentValue = getFieldValue(field, source);
-                separator = separator != null ? separator : ConverterConfig.getSEPARATOR();
-                value += separator + currentValue;
-            }
         }
-        if (isDebug) {
-            logger.info("Setting target field '" + targetObjectField.getName() + "' value : " + value);
-        }
+        targetObjectField.setAccessible(true);
         targetObjectField.set(target, value);
-    }
-
-
-    private Object getFieldValue(Field field, Object source) throws IllegalAccessException {
-        Object value = null;
-        field.setAccessible(true);
-        value = field.get(source);
-        return value;
     }
 }

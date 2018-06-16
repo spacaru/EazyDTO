@@ -27,7 +27,7 @@ public interface ReflectiveMapper<T extends AttributeAccesorType> {
      * @param sourceField
      * @return - the field
      */
-    Field getField(T action, Object source, String sourceField);
+    Field getField(T action, Object source, String sourceField,ResourceSharingService resourceSharingService);
 
     /**
      * @param attributeAccesorType
