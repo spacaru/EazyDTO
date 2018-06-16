@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ReflectiveMapperTest {
+public class FieldActionTest {
 
     private MapperFactoryImpl genericMapperFactoryImpl;
     private static final String STRING_VALUE = "STRING_TEST";

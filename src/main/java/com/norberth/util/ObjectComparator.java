@@ -16,12 +16,19 @@ public class ObjectComparator implements Comparator<Object> {
     @Override
     public int compare(Object o1, Object o2) {
         try {
-            Field o1Field = o1.getClass().getDeclaredField(objectAttribute);
-            Field o2Field = o2.getClass().getDeclaredField(objectAttribute);
-            o1Field.setAccessible(true);
-            o2Field.setAccessible(true);
-            Object o1Value = o1Field.get(o1);
-            Object o2Value = o2Field.get(o2);
+            Object o1Value = null;
+            Object o2Value = null;
+            if (!o1.getClass().isAssignableFrom(String.class) && !o2.getClass().isAssignableFrom(String.class)) {
+                Field o1Field = o1.getClass().getDeclaredField(objectAttribute);
+                Field o2Field = o2.getClass().getDeclaredField(objectAttribute);
+                o1Field.setAccessible(true);
+                o2Field.setAccessible(true);
+                o1Value = o1Field.get(o1);
+                o2Value = o2Field.get(o2);
+            } else {
+                o1Value = o1;
+                o2Value = o2;
+            }
             if (sortingType.equals(SortingType.ASCENDING)) {
                 return o1Value.toString().compareTo(o2Value.toString());
             } else {

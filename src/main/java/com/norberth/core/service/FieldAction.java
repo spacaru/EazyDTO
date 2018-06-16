@@ -2,7 +2,7 @@ package com.norberth.core.service;
 
 import java.lang.reflect.Field;
 
-public interface ReflectiveMapper<T extends AttributeAccesorType> {
+public interface FieldAction<T extends AttributeAccesorType> {
 
     /**
      * Returns the current action to perform based on field implementation

@@ -14,7 +14,7 @@ public class ParentChildTest {
 
     @Before
     public void setUp() {
-        mapperFactory = MapperFactoryImpl.withPackageName("com.norberth");
+        mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth");
 
     }
 
@@ -28,11 +28,11 @@ public class ParentChildTest {
         ChildEntity thirdChild = new ChildEntity();
         ChildEntity fourthChild = new ChildEntity();
         ChildEntity fifthChild = new ChildEntity();
-        firstChild.setChildName("first-born");
-        secondChild.setChildName("second-born");
-        thirdChild.setChildName("third-born");
-        fourthChild.setChildName("fourth-born");
-        fifthChild.setChildName("fifth-born");
+        firstChild.setChildName("a-born");
+        secondChild.setChildName("b-born");
+        thirdChild.setChildName("d-born");
+        fourthChild.setChildName("z-born");
+        fifthChild.setChildName("c-born");
         parentEntity.setChildren(Arrays.asList(fifthChild, secondChild, thirdChild, fourthChild, fifthChild));
 
         Parent2ChildDTO parent2ChildDTO = (Parent2ChildDTO) mapperFactory.getMapper(Parent2ChildDTO.class).getTo(parentEntity);
