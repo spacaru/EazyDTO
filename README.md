@@ -29,9 +29,8 @@ usage :
 <h2>Mapper factory initialization</h2>
      <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth"); </code></br>
 
-<h3> Generic converter usage </h3></br>
 
-<h4>EntityDTO.class</h4>
+<h4>Fragment from EntityDTO class</h4>
 <code>
 @MapObject(fromClass = Entity.class)
 public class EntityDTO {
@@ -51,6 +50,6 @@ public class EntityDTO {
 
     private boolean boolTest;
 </code>
-
+<h3> Generic converter usage </h3></br>
  <code>  EntityDTO createdDTO = (EntityDTO) genericMapperFactoryImpl.getMapper(EntityDTO.class).getTo(entity);</code></br>
 <h3>Examples in test package</h3>
