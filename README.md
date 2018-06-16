@@ -13,10 +13,21 @@ usage :
         <li> @MapList - <b>value</b>  - entity source field </li>
 </ul>
 
-<h2>Converter manager initialization</h2>
-        <code>GenericConverterManager gcm = GenericConverterManager.getInstance();</code><br/>
-        <code>gcm.setDebug(true);</code><br/>
-        <code> gcm.setPackageName("com.norberth.test"); </code><br/>
+<h2>Features </h2> </br>
+-map any dto using @MapObject and @MapAttribute annotations </br>
+-easily extensible ( implement CustomEvent<SourceEntity,TargetDTO> interface ) and add custom behavior inside postMap method </br>
+-easy to install in any project : </br>
+* initialize a MapperFactory
+* use mapperFactory methods to map objects
+* JPA support to mapperFactory ( use setEntityManager to provide a connection to your database and then map DTO lists directly from DB using getToListFromSql and getToFromSql methods )
+
+<H3>Intallation guide</H3></br>
+1. Download github repository.</br>
+2. Build the project using <code> mvn clean install </code></br>
+3. Add the generated jar to your project
+
+<h2>Mapper factory initialization</h2>
+     <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth"); </code></br>
 
 <h3> Generic converter usage </h3>
        <code>GenericConverter userDetailsConverter = gcm.getConverter(UserDetailsTO.class);</code><br/>
