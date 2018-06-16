@@ -53,3 +53,7 @@ public class EntityDTO {
 <h3> Generic converter usage </h3></br>
  <code>  EntityDTO createdDTO = (EntityDTO) genericMapperFactoryImpl.getMapper(EntityDTO.class).getTo(entity);</code></br>
 <h1><b>More examples in test package</b></h1>
+
+
+<h3> Contact </h3>
+For any informations contact me at : norberth.novanc@gmail.com
