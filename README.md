@@ -37,17 +37,17 @@ public class EntityDTO {
 
     @MapAttribute("intTest")
     private int intTest;
+    
     @MapAttribute("doubleTest")
-
     private double doubleTest;
+    
     @MapAttribute("stringTest")
-
     private String stringTest;
+    
     @MapAttribute("floatTest")
-
     private float floatTest;
+    
     @MapAttribute("boolTest")
-
     private boolean boolTest;
 </code>
 <h3> Generic converter usage </h3></br>
