@@ -1,6 +1,6 @@
-# Entity2TO
+# EazyDTO
 
-An easy to use Entity to Transfer Object mapper
+An easy to use Entity -> Data Transfer Object annotation processor
 
 
 usage : 
