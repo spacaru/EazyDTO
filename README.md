@@ -1,6 +1,6 @@
-# Entity2TO
+# EazyDTO
 
-An easy to use Entity to Transfer Object mapper
+An easy to use Entity -> Data Transfer Object annotation processor
 
 
 usage : 
@@ -27,8 +27,33 @@ usage :
 3. Add the generated jar to your project
 
 <h2>Mapper factory initialization</h2>
-     <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth"); </code></br>
+     <code> mapperFactory = MapperFactoryImpl.withDebugEnabled(true).scanPackage("com.norberth"); </code></br>
 
+
+<h4>Fragment from EntityDTO class</h4>
+<code>
+@MapObject(fromClass = Entity.class)
+public class EntityDTO {
+
+    @MapAttribute("intTest")
+    private int intTest;
+    
+    @MapAttribute("doubleTest")
+    private double doubleTest;
+    
+    @MapAttribute("stringTest")
+    private String stringTest;
+    
+    @MapAttribute("floatTest")
+    private float floatTest;
+    
+    @MapAttribute("boolTest")
+    private boolean boolTest;
+</code>
 <h3> Generic converter usage </h3></br>
- <code>  EntityDTO createdDTO = (EntityDTO) genericMapperFactoryImpl.getMapper(EntityDTO.class).getTo(entity);</code></br>
-<h3>Examples in test package</h3>
+ <code>  EntityDTO createdDTO = (EntityDTO) mapperFactory.getMapper(EntityDTO.class).getTo(entity);</code></br>
+<h1><b>More examples in test package</b></h1>
+
+
+<h3> Contact </h3>
+For any informations contact me at : norberth.novanc@gmail.com
