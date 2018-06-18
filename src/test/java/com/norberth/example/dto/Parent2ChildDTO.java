@@ -7,6 +7,7 @@ import com.norberth.example.ParentEntity;
 import com.norberth.example.custom.mapper.CustomParent2ChildMapper;
 
 import java.util.List;
+import java.util.Set;
 
 @MapObject(fromClass = ParentEntity.class, customMapperClass = CustomParent2ChildMapper.class)
 public class Parent2ChildDTO {
@@ -14,7 +15,7 @@ public class Parent2ChildDTO {
     @MapAttribute("parentName")
     private String parentName;
     @MapObject(value = "children.childName", fromClass = ChildEntity.class)
-    private List<String> children;
+    private Set<String> children;
 
     public String getParentName() {
         return parentName;
@@ -24,11 +25,11 @@ public class Parent2ChildDTO {
         this.parentName = parentName;
     }
 
-    public List<String> getChildren() {
+    public Set<String> getChildren() {
         return children;
     }
 
-    public void setChildren(List<String> children) {
+    public void setChildren(Set<String> children) {
         this.children = children;
     }
 

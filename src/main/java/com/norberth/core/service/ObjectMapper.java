@@ -3,10 +3,7 @@ package com.norberth.core.service;
 import com.norberth.config.ConverterConfig;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class ObjectMapper implements FieldAction<AttributeAccesorType> {
@@ -188,15 +185,33 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
                     if (isStringMapping) {
-                        List<Object> retList = new ArrayList<>();
-                        for (Object obj : (List) source) {
-                            Field targetField = obj.getClass().getDeclaredField(name);
-                            targetField.setAccessible(true);
-                            if (source instanceof List) {
-                                addObjectsInList((List) source, currentField, retList);
+                        Object retList = null;
+                        if (source instanceof List) {
+                            source = (List) source;
+                            retList = new ArrayList<>();
+                            for (Object obj : (List) source) {
+                                Field targetField = obj.getClass().getDeclaredField(name);
+                                targetField.setAccessible(true);
+                                if (source instanceof List) {
+                                    addObjectsInList((List) source, currentField, (List) retList);
+                                }
+                                return retList;
                             }
-                            return retList;
+                        } else if (source instanceof Set) {
+                            retList = new HashSet();
+
+                            for (Object obj : (Set) source) {
+                                Field targetField = obj.getClass().getDeclaredField(name);
+                                targetField.setAccessible(true);
+                                if (source instanceof List) {
+                                    addObjectsInList((List) source, currentField, (List) retList);
+                                } else {
+                                    addObjectsInSet((Set) source, currentField, (Set) retList);
+                                }
+                                return retList;
+                            }
                         }
+
                     } else {
 
                         if (source instanceof List) {
@@ -220,6 +235,15 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
             return f;
         }
         return f;
+    }
+
+    private void addObjectsInSet(Set source, String name, Set retList) throws NoSuchFieldException, IllegalAccessException {
+        for (Object obj : source) {
+            Field targetFieldInObject = obj.getClass().getDeclaredField(name);
+            targetFieldInObject.setAccessible(true);
+            Object value = targetFieldInObject.get(obj);
+            retList.add(value);
+        }
     }
 
     private void addObjectsInList(List source, String name, List<Object> newList) throws NoSuchFieldException, IllegalAccessException {

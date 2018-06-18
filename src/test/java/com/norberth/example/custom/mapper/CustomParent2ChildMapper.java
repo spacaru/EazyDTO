@@ -13,7 +13,7 @@ public class CustomParent2ChildMapper implements CustomEvent<ParentEntity, Paren
 
 //        for example we can sort lists easily by attribute
         System.out.println(transferObject.getChildren());
-        transferObject.getChildren().sort(new ObjectComparator("childName", SortingType.ASCENDING));
+//        transferObject.getChildren().sort(new ObjectComparator("childName", SortingType.ASCENDING));
         System.out.println(transferObject.getChildren());
 
 //        we can see the difference

@@ -257,7 +257,7 @@ public class DTOMapper implements Mapper {
                 String sourceField = ((MapObject) mapObject).value();
                 try {
                     Field toField = oldTarget.getClass().getDeclaredField(f.getName());
-                    if (f.getType().equals(List.class)) {
+                    if (f.getType().equals(List.class) || f.getType().equals(Set.class)) {
                         mapList(source, target, objectMapper, f);
                     } else {
 
@@ -290,7 +290,7 @@ public class DTOMapper implements Mapper {
         Field field = objectMapper.getField(attributeAccesorType, source, sourceField, resourceSharingService);
         Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
         Object value = null;
-        if (targetObjectField.getGenericType().getTypeName().equals("java.util.List<java.lang.String>")) {
+        if (targetObjectField.getGenericType().getTypeName().contains("String") || targetObjectField.getGenericType().getTypeName().contains("Set")) {
             value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField, true);
 
         } else {
