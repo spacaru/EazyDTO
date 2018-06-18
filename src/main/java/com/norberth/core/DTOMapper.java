@@ -243,7 +243,7 @@ public class DTOMapper implements Mapper {
                 Field field = objectMapper.getField(attributeAccesorType, source, sourceField, new ResourceSharingService());
                 currentSource = objectMapper.getSource(attributeAccesorType, source, sourceField, false);
                 Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
-                Object value = objectMapper.getValue(field, currentSource, false, null, false, targetObjectField);
+                Object value = objectMapper.getValue(field, currentSource, false, null, false, targetObjectField, false);
                 if (field != null) {
                     field.setAccessible(true);
                 }
@@ -284,11 +284,18 @@ public class DTOMapper implements Mapper {
 
     private void mapList(Object source, Object target, ObjectMapper objectMapper, Field f) throws IllegalAccessException {
         String sourceField = f.getAnnotation(MapObject.class).value();
+        Class fromClass = f.getAnnotation(MapObject.class).fromClass();
         AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
         ResourceSharingService resourceSharingService = new ResourceSharingService();
         Field field = objectMapper.getField(attributeAccesorType, source, sourceField, resourceSharingService);
         Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
-        Object value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField);
+        Object value = null;
+        if (targetObjectField.getGenericType().getTypeName().equals("java.util.List<java.lang.String>")) {
+            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField, true);
+
+        } else {
+            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField, false);
+        }
         if (field != null) {
             field.setAccessible(true);
         }

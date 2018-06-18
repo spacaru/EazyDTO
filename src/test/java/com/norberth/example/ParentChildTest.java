@@ -14,7 +14,7 @@ public class ParentChildTest {
 
     @Before
     public void setUp() {
-        mapperFactory = MapperFactoryImpl.withDebugEnabled(true).withPackageName("com.norberth");
+        mapperFactory = MapperFactoryImpl.withDebugEnabled(true).scanPackage("com.norberth");
 
     }
 

@@ -3,7 +3,6 @@ package com.norberth.core.service;
 import com.norberth.config.ConverterConfig;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,14 +97,14 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
     }
 
     @Override
-    public Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField) {
+    public Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField, boolean isNotCustomDTO) {
         Object value = null;
         try {
             if (!isListField) {
                 value = getFieldValue(field, source, targetObjectField);
             } else {
                 String[] split = sourceField.split(ConverterConfig.getEscapedNameDelimiter());
-                value = getListValues(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], isInherited);
+                value = getListValues(new ArrayList<String>(Arrays.asList(split)), source, split[split.length - 1], isInherited, isNotCustomDTO);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -179,47 +178,38 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
         return sourceObject;
     }
 
-    private Object getListValues(ArrayList<String> sourceList, Object source, String name, boolean isInherited) {
+    private Object getListValues(ArrayList<String> sourceList, Object source, String name, boolean isInherited, boolean isStringMapping) {
         ListIterator<String> stringListIterator = sourceList.listIterator();
+        Object retObject = null;
         Field f = null;
         try {
             while (stringListIterator.hasNext()) {
                 String currentField = stringListIterator.next();
                 stringListIterator.remove();
                 if (!stringListIterator.hasNext()) {
-                    if (source instanceof List) {
-                        List<Object> newList = new ArrayList<>();
+                    if (isStringMapping) {
+                        List<Object> retList = new ArrayList<>();
                         for (Object obj : (List) source) {
-                            Object sourceObject = obj.getClass().newInstance();
-                            Field sourceField = null;
-                            if (!isInherited) {
-                                sourceField = sourceObject.getClass().getDeclaredField(name);
-                            } else {
-                                sourceField = sourceObject.getClass().getSuperclass().getDeclaredField(name);
+                            Field targetField = obj.getClass().getDeclaredField(name);
+                            targetField.setAccessible(true);
+                            if (source instanceof List) {
+                                addObjectsInList((List) source, currentField, retList);
                             }
-                            sourceField.setAccessible(true);
-                            Object value = sourceField.get(obj);
-                            Object targetObject = null;
-                            if (sourceField.getType().isPrimitive() || sourceField.getType().equals(Integer.class) || sourceField.getType().equals(String.class) || sourceField.getType().equals(Long.class) || sourceField.getType().equals(Float.class) || sourceField.getType().equals(Byte.class) || sourceField.getType().equals(BigDecimal.class)) {
-                                targetObject = value;
-                            } else {
-                                Object newObject = sourceField.getType().newInstance();
-                                sourceField.set(newObject, value);
-                            }
-                            newList.add(targetObject);
+                            return retList;
                         }
-                        return newList;
                     } else {
-                        return null;
-                    }
 
+                        if (source instanceof List) {
+                            List<Object> newList = new ArrayList<>();
+                            addObjectsInList((List) source, name, newList);
+                            return newList;
+                        }
+                    }
                 } else {
                     Field targetField = source.getClass().getDeclaredField(currentField);
                     targetField.setAccessible(true);
                     Object newSource = targetField.get(source);
-                    Object retObject = null;
-                    retObject = getListValues(sourceList, newSource, name, isInherited);
-                    return retObject;
+                    return getListValues(sourceList, newSource, name, isInherited, isStringMapping);
                 }
 
             }
@@ -228,10 +218,17 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
             return f;
         } catch (IllegalAccessException e) {
             return f;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
         }
         return f;
+    }
+
+    private void addObjectsInList(List source, String name, List<Object> newList) throws NoSuchFieldException, IllegalAccessException {
+        for (Object obj : source) {
+            Field targetFieldInObject = obj.getClass().getDeclaredField(name);
+            targetFieldInObject.setAccessible(true);
+            Object value = targetFieldInObject.get(obj);
+            newList.add(value);
+        }
     }
 
     private Object getFieldValue(Field field, Object source, Field targetObjectField) throws IllegalAccessException {

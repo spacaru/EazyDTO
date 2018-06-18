@@ -33,7 +33,7 @@ public class MapperFactoryImpl extends MapperFactory {
         return instance;
     }
 
-    public static MapperFactoryImpl withPackageName(String packageName) {
+    public static MapperFactoryImpl scanPackage(String packageName) {
         getInstance();
         instance.packageName = packageName;
         return instance;

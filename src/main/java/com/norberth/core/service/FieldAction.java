@@ -40,6 +40,6 @@ public interface FieldAction<T extends AttributeAccesorType> {
     Object getSource(AttributeAccesorType attributeAccesorType, Object source, String sourceField, boolean inheritedField);
 
 
-    Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField);
+    Object getValue(Field field, Object source, boolean isListField, String sourceField, boolean isInherited, Field targetObjectField, boolean isNotCustomDTO);
 
 }

@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FieldActionTest {
+public class SimpleDTOMapperTest {
 
     private MapperFactoryImpl genericMapperFactoryImpl;
     private static final String STRING_VALUE = "STRING_TEST";
@@ -23,7 +23,7 @@ public class FieldActionTest {
 
     @Before
     public void setUp() {
-        genericMapperFactoryImpl = MapperFactoryImpl.withPackageName("com.norberth.entity").withDebugEnabled(true).build();
+        genericMapperFactoryImpl = MapperFactoryImpl.scanPackage("com.norberth.entity").withDebugEnabled(true).build();
     }
 
     @After
@@ -77,7 +77,7 @@ public class FieldActionTest {
 
     @Test
     public void assertNoPackageErrorThrown() {
-        MapperFactoryImpl genericMapperFactoryImpl = MapperFactoryImpl.withPackageName(null).build();
+        MapperFactoryImpl genericMapperFactoryImpl = MapperFactoryImpl.scanPackage(null).build();
 //        reset package name
         Mapper objectConverter = genericMapperFactoryImpl.getMapper(TestObjectDataTypesTO.class);
         Assert.assertEquals(objectConverter, null);

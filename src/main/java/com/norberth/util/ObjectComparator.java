@@ -29,6 +29,9 @@ public class ObjectComparator implements Comparator<Object> {
                 o1Value = o1;
                 o2Value = o2;
             }
+            if (o1Value == null || o2Value == null) {
+                throw new RuntimeException("Null object! Sorting impossible. ;(");
+            }
             if (sortingType.equals(SortingType.ASCENDING)) {
                 return o1Value.toString().compareTo(o2Value.toString());
             } else {
