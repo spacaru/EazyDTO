@@ -50,7 +50,7 @@ public class EntityDTO {
     @MapAttribute("boolTest")
     private boolean boolTest;
 </code>
-<h3> Generic converter usage </h3></br>
+<h3> Mapper usage </h3></br>
  <code>  EntityDTO createdDTO = (EntityDTO) mapperFactory.getMapper(EntityDTO.class).getTo(entity);</code></br>
 <h1><b>More examples in test package</b></h1>
 
