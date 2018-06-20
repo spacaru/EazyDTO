@@ -291,10 +291,10 @@ public class DTOMapper implements Mapper {
         Field targetObjectField = objectMapper.getTargetObjectField(attributeAccesorType, target, f.getName());
         Object value = null;
         if (targetObjectField.getGenericType().getTypeName().contains("String") || targetObjectField.getGenericType().getTypeName().contains("Set")) {
-            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField, true);
+            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIsInherited(), targetObjectField, true);
 
         } else {
-            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIS_INHERITED(), targetObjectField, false);
+            value = objectMapper.getValue(field, source, true, sourceField, resourceSharingService.getIsInherited(), targetObjectField, false);
         }
         if (field != null) {
             field.setAccessible(true);

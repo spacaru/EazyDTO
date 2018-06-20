@@ -45,7 +45,7 @@ public class ObjectMapper implements FieldAction<AttributeAccesorType> {
         } catch (NoSuchFieldException e) {
             try {
                 retField = source.getClass().getSuperclass().getDeclaredField(sourceField);
-                resourceSharingService.setIS_INHERITED(true);
+                resourceSharingService.setIsInherited(true);
                 return retField;
             } catch (NoSuchFieldException e1) {
                 e1.printStackTrace();

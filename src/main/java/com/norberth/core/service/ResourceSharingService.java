@@ -2,17 +2,17 @@ package com.norberth.core.service;
 
 public class ResourceSharingService {
 
-    private Boolean IS_INHERITED;
+    private Boolean isInherited;
 
     public ResourceSharingService() {
-        IS_INHERITED = new Boolean(false);
+        isInherited = new Boolean(false);
     }
 
-    public Boolean getIS_INHERITED() {
-        return IS_INHERITED;
+    public Boolean getIsInherited() {
+        return isInherited;
     }
 
-    public void setIS_INHERITED(Boolean IS_INHERITED) {
-        this.IS_INHERITED = IS_INHERITED;
+    public void setIsInherited(Boolean isInherited) {
+        this.isInherited = isInherited;
     }
 }
