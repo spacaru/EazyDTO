@@ -1,11 +1,13 @@
 package com.norberth.example;
 
 
+import java.util.List;
+
 public class ParentEntity {
 
     private int id;
     private String parentName;
-    private java.util.Set children;
+    private List<ChildEntity> children;
 
     public ParentEntity() {
     }
@@ -26,14 +28,12 @@ public class ParentEntity {
         this.id = id;
     }
 
-    public java.util.Set getChildren() {
+
+    public List<ChildEntity> getChildren() {
         return children;
     }
 
-    public void setChildren(java.util.Set children) {
+    public void setChildren(List<ChildEntity> children) {
         this.children = children;
-    }
-
-    private class Set<T> {
     }
 }

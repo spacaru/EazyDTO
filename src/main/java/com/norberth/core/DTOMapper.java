@@ -179,9 +179,9 @@ public class DTOMapper implements Mapper {
     @Override
     public List<Object> getToListSortBy(List sourceList, String attribute, SortingType sortingType) {
         List<Object> retList = new ArrayList<>();
-        for (Object sourceObj : sourceList) {
-            retList.add(getTo(sourceObj));
-        }
+        retList.stream().forEach(obj -> {
+            getTo(obj);
+        });
         retList.removeAll(Collections.singleton(null));
         if (sortingType == null) {
             sortingType = SortingType.ASCENDING;
@@ -253,7 +253,6 @@ public class DTOMapper implements Mapper {
                 mapList(source, target, objectMapper, f);
             } else if (f.getAnnotation(MapObject.class) != null) {
                 Annotation mapObject = f.getAnnotation(MapObject.class);
-                Class c = ((MapObject) mapObject).fromClass();
                 String sourceField = ((MapObject) mapObject).value();
                 try {
                     Field toField = oldTarget.getClass().getDeclaredField(f.getName());
@@ -284,7 +283,6 @@ public class DTOMapper implements Mapper {
 
     private void mapList(Object source, Object target, ObjectMapper objectMapper, Field f) throws IllegalAccessException {
         String sourceField = f.getAnnotation(MapObject.class).value();
-        Class fromClass = f.getAnnotation(MapObject.class).fromClass();
         AttributeAccesorType attributeAccesorType = objectMapper.getAction(sourceField);
         ResourceSharingService resourceSharingService = new ResourceSharingService();
         Field field = objectMapper.getField(attributeAccesorType, source, sourceField, resourceSharingService);

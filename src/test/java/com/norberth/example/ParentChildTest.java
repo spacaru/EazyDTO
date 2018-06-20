@@ -7,7 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ParentChildTest {
@@ -34,7 +36,7 @@ public class ParentChildTest {
         thirdChild.setChildName("d-born");
         fourthChild.setChildName("z-born");
         fifthChild.setChildName("c-born");
-        Set s = new HashSet<ChildEntity>();
+        List s = new ArrayList();
         s.add(fifthChild);
         s.add(thirdChild);
         s.add(fourthChild);
