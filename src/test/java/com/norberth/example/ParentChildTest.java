@@ -8,9 +8,7 @@ import org.junit.Test;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ParentChildTest {
     private MapperFactory mapperFactory;
@@ -45,7 +43,9 @@ public class ParentChildTest {
 
         Parent2ChildDTO parent2ChildDTO = (Parent2ChildDTO) mapperFactory.getMapper(Parent2ChildDTO.class).getTo(parentEntity);
         Assert.notNull(parent2ChildDTO);
-        System.out.println(parent2ChildDTO);
+        parent2ChildDTO.getChildren().stream().forEach(child -> {
+            Assert.notNull(child);
+        });
 //        it is possible to map only certain values from object as we see in parent2childto -> children are mapped from ParentEntity's children
     }
 }
