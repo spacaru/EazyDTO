@@ -180,12 +180,9 @@ public class DTOMapper implements Mapper {
     public List<Object> getToListSortBy(List sourceList, String attribute, SortingType sortingType) {
         List<Object> retList = new ArrayList<>();
         retList.stream().forEach(obj -> {
-            getTo(obj);
+            retList.add(getTo(obj));
         });
         retList.removeAll(Collections.singleton(null));
-        if (sortingType == null) {
-            sortingType = SortingType.ASCENDING;
-        }
         Collections.sort(retList, new ObjectComparator(attribute, sortingType));
         return retList;
     }
